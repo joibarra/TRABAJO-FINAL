@@ -149,6 +149,79 @@ export default function Home() {
           <h1 style={{ color: "#61F2B1", fontSize: "24px", fontWeight: "bold"}}>Home</h1>
           <button style={{ color: "#61F2B1", fontWeight: "bold" }} onClick={handleLogout}>Cerrar Sesión</button>
         </header>
+        <form action="">
+        <fieldset>
+          <label style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
+            Título:
+            <input
+              type="text"
+              name="title"
+              style={{
+                marginLeft: "10px",
+                width: "calc(100% - 20px)",
+                padding: "5px",
+                border: "1px solid black",
+              }}
+            />
+          </label>
+          <label style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
+            Artista:
+            <input
+              type="text"
+              name="artist"
+              style={{
+                marginLeft: "10px",
+                width: "calc(100% - 20px)",
+                padding: "5px",
+                border: "1px solid black",
+              }}
+            />
+          </label>
+          <label style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
+            Año:
+            <input
+              type="text"
+              name="year"
+              style={{
+                marginLeft: "10px",
+                width: "calc(100% - 20px)",
+                padding: "5px",
+                border: "1px solid black",
+              }}
+            />
+          </label>
+          <label style={{ flex: 1, color: "#61F2B1" }}>
+            Creado por:
+            <input
+              type="text"
+              name="createdBy"
+              style={{
+                marginLeft: "10px",
+                width: "calc(100% - 20px)",
+                padding: "5px",
+                border: "1px solid black",
+              }}
+            />
+          </label>
+          <button
+            type="submit"
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              backgroundColor: "#333",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              alignSelf: "flex-end",
+              border: "2px solid black",
+            }}
+          >
+            Buscar
+          </button>
+        </fieldset>
+    </form>
+
         <div>
           <TableContainer component={Paper}>
             <Table>
