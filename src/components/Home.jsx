@@ -37,6 +37,7 @@ export default function Home() {
     {path: "/articles", label: "articles"},
     {path: "/songs", label: "songs"},
     {path: "/profile", label: "profile"},
+    {path: "/BuscadorDeCanciones", label: "BuscadorDeCanciones"},
   ];
 
   useEffect(() => {

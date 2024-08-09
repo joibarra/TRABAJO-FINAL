@@ -1,4 +1,4 @@
-import {createBrowserRouter} from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import ArticleForm from "../components/Article/ArticleForm";
 import Home from "../components/Home";
 import Login from "../components/Auth/Login";
@@ -7,6 +7,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import Profile from "../components/Profile";
 import SongList from "../components/MusicPlayer/SongList";
 import Article from "../components/Article/Article";
+import BuscadorDeCanciones from "../components/BuscadorDeCanciones"; // Asegúrate de que la ruta de importación sea correcta
+
 const routes = [
   {
     element: <Layout />,
@@ -56,6 +58,14 @@ const routes = [
           </ProtectedRoute>
         ),
       },
+      {
+        path: "BuscadorDeCanciones", // Agrega la ruta para BuscadorDeCanciones
+        element: (
+          <ProtectedRoute>
+            <BuscadorDeCanciones />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   {
@@ -63,6 +73,7 @@ const routes = [
     element: <h1>Not Found</h1>,
   },
 ];
+
 const Router = createBrowserRouter(routes);
 
-export {Router, routes};
+export { Router, routes };
