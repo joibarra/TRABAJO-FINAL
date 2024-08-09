@@ -126,7 +126,7 @@ export default function Home() {
 
   return (
     <div style={{display: "flex", height: "100vh"}}>
-      <aside style={{width: "200px", background: "#f4f4f4", padding: "10px"}}>
+      <aside style={{width: "200px", background: "#A5FFC9", padding: "10px"}}>
         <nav>
           <ul style={{listStyle: "none", padding: 0}}>
             {menuItems.map((item, index) => (
@@ -137,7 +137,7 @@ export default function Home() {
           </ul>
         </nav>
       </aside>
-      <main style={{flex: 1, padding: "10px"}}>
+      <main style={{flex: 1, background: "#222222", padding: "10px"}}>
         <header
           style={{
             display: "flex",
@@ -145,8 +145,8 @@ export default function Home() {
             alignItems: "center",
           }}
         >
-          <h1>Home</h1>
-          <button onClick={handleLogout}>Cerrar Sesión</button>
+          <h1 style={{ color: "#61F2B1", fontSize: "24px", fontWeight: "bold"}}>Home</h1>
+          <button style={{ color: "#61F2B1", fontWeight: "bold" }} onClick={handleLogout}>Cerrar Sesión</button>
         </header>
         <div>
           <TableContainer component={Paper}>
