@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import SongCard from "./SongCard";
-import PopupAlbum from "../popup/PopupAlbum"; // Ajusta la ruta según la estructura de tu proyecto
+import PopupSongs from "../popup/PopupSongs";
 
 function SongList() {
   const [page, setPage] = useState(1);
@@ -91,12 +91,9 @@ function SongList() {
     setIsPopupVisible(true);
   }
 
-  function handlePopupClose(formData) {
+  function handlePopupClose() {
     setIsPopupVisible(false);
-    if (formData) {
-      // Lógica para agregar el nuevo álbum
-      console.log("Nuevo álbum agregado:", formData);
-    }
+   
   }
 
   if (isError) return <p>Error al cargar las canciones.</p>;
@@ -179,7 +176,7 @@ function SongList() {
         {isLoading && <p>Cargando más canciones...</p>}
       </div>
       {isPopupVisible && (
-        <PopupAlbum album={selectedAlbum} onClose={handlePopupClose} />
+        <PopupSongs onClose={handlePopupClose}/>
       )}
     </div>
   );

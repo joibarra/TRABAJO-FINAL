@@ -304,7 +304,7 @@ export default function Home() {
             </Table>
           </TableContainer>
           {showPopupAlbum && (
-            <PopupAlbum album={selectedAlbum} onClose={handleClosePopupAlbum} />
+            <PopupSongs album={selectedAlbum} onClose={handleClosePopupAlbum} />
           )}
           {showPopup && (
             <PopupMsj message={message} onClose={handleClosePopup} />
