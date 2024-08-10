@@ -34,10 +34,10 @@ export default function Home() {
   };
   // Definir las rutas de menú manualmente si no están bajo un padre común
   const menuItems = [
-    {path: "/articles", label: "articles"},
-    {path: "/songs", label: "songs"},
-    {path: "/profile", label: "profile"},
-    {path: "/BuscadorDeCanciones", label: "BuscadorDeCanciones"},
+    {path: "/articles", label: "Articulos"},
+    {path: "/songs", label: "Canciones"},
+    {path: "/profile", label: "Perfil"},
+  //  {path: "/BuscadorDeCanciones", label: "BuscadorDeCanciones"},
   ];
  //para reveer
   const addAlbum = () => {
