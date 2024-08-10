@@ -1,13 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
-import ArticleForm from "../components/Article/ArticleForm";
-import Home from "../components/Home";
-import Login from "../components/Auth/Login";
+import AlbumsForm from "../components/Album/AlbumsForm";
 import Layout from "./Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import Profile from "../components/Profile";
 import SongList from "../components/MusicPlayer/SongList";
-import Article from "../components/Article/Article";
+import Album from "../components/Album/Albums";
 import BuscadorDeCanciones from "../components/BuscadorDeCanciones"; // Asegúrate de que la ruta de importación sea correcta
+import Login from "../components/Auth/Login";
+import Albums from "../components/Album/Albums";
 
 const routes = [
   {
@@ -18,21 +18,21 @@ const routes = [
         element: <Login />,
       },
       {
-        path: "home",
+        path: "album",
         element: (
           <ProtectedRoute>
-            <Home />
+            <Albums />
           </ProtectedRoute>
         ), // Página de inicio en la ruta "/home"
       },
       {
-        path: "articles",
+        path: "albums",
         children: [
           {
             index: true,
             element: (
               <ProtectedRoute>
-                <Article />
+                <Album />
               </ProtectedRoute>
             ),
           },
@@ -40,7 +40,7 @@ const routes = [
             path: "add",
             element: (
               <ProtectedRoute>
-                <ArticleForm />
+                <AlbumsForm />
               </ProtectedRoute>
             ),
           },

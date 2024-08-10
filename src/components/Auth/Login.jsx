@@ -32,7 +32,7 @@ function Login() {
         })
         .then((responseData) => {
           login(responseData.token);
-          navigate("/home");
+          navigate("/albums");
         })
         .catch((error) => {
           console.error("Error error al iniciar sesión", error);
@@ -69,6 +69,7 @@ function Login() {
                   type="text"
                   id="username"
                   name="username"
+                  placeholder="Ingrese nombre del usuario"
                   ref={usernameRef}
                 />
                 <span className="icon is-small is-left">
@@ -84,6 +85,7 @@ function Login() {
                   type="password"
                   id="password"
                   name="password"
+                  placeholder="Ingrese su contraseña"
                   ref={passwordRef}
                 />
                 <span className="icon is-small is-left">

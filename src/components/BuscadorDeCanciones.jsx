@@ -7,7 +7,7 @@ export default function BuscadorDeCanciones() {
       <aside style={{ width: "15%", padding: "20px", backgroundColor: "#f0f0f0", boxShadow: "2px 0 5px rgba(0,0,0,0.1)", borderRight: "2px solid black" }}>
         <nav>
           <ul style={{ listStyleType: "none", padding: 0 }}>
-            <li style={{ marginBottom: "10px" }}><a href="/articles" style={{ textDecoration: "none", color: "#333", borderBottom: "1px solid black" }}>Lista</a></li>
+            <li style={{ marginBottom: "10px" }}><a href="/albums" style={{ textDecoration: "none", color: "#333", borderBottom: "1px solid black" }}>Lista</a></li>
             <li style={{ marginBottom: "10px" }}><a href="/songs" style={{ textDecoration: "none", color: "#333", borderBottom: "1px solid black" }}>Canciones</a></li>
             <li><a href="/profile" style={{ textDecoration: "none", color: "#333", borderBottom: "1px solid black" }}>Perfil</a></li>
           </ul>

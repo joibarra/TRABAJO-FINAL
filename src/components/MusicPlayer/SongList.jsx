@@ -83,7 +83,7 @@ function SongList() {
   }
 
   function handleBack() {
-    navigate("/home");
+    navigate("/albums");
   }
 
   function handleAdd() {

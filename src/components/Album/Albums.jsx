@@ -14,11 +14,11 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {useAuth} from "../contexts/AuthContext";
-import PopupMsj from "./popup/PopupMsj";
-import PopupAlbum from "./popup/PopupAlbum";
+import PopupAlbum from "../popup/PopupAlbum";
+import { useAuth } from "../../contexts/AuthContext";
+import PopupMsj from "../popup/PopupMsj";
 
-export default function Home() {
+export default function Albums() {
   const navigate = useNavigate();
   const state = useAuth("state");
   const [isError, setIsError] = useState(false);
@@ -149,7 +149,7 @@ export default function Home() {
             alignItems: "center",
           }}
         >
-          <h1 style={{ color: "#61F2B1", fontSize: "24px", fontWeight: "bold"}}>Home</h1>
+          <h1 style={{ color: "#61F2B1", fontSize: "24px", fontWeight: "bold"}}>Albums</h1>
           <button style={{  marginTop: "20px", padding: "10px 20px", backgroundColor: "#333", color: "#61F2B1", border: "none",  borderRadius: "5px", cursor: "#61F2B1", alignSelf: "flex-end", border: "2px solid black", }} onClick={handleLogout}>Cerrar Sesión</button>
         </header>
         <form action="">

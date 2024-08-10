@@ -3,13 +3,13 @@ import {useAuth} from "../../contexts/AuthContext";
 import {useNavigate} from "react-router-dom";
 import PopupMsj from "../popup/PopupMsj";
 
-export default function ArticleForm() {
-  const [articleData, setArticleData] = useState({title: "", content: ""});
+export default function AlbumForm() {
+  const [albumData, setAlbumData] = useState({title: "", content: ""});
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [articleImage, setArticleImage] = useState(null);
+  const [albumImage, setAlbumImage] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
   const state = useAuth("state");
@@ -38,8 +38,8 @@ export default function ArticleForm() {
   );
 
   function handleInputChange(event) {
-    setArticleData({
-      ...articleData,
+    setAlbumData({
+      ...albumData,
       [event.target.name]: event.target.value,
     });
   }
@@ -60,7 +60,7 @@ export default function ArticleForm() {
   }
 
   function handleImageChange(event) {
-    setArticleImage(event.target.files[0]);
+    setAlbumImage(event.target.files[0]);
   }
 
   function handleSubmit(event) {
@@ -68,12 +68,12 @@ export default function ArticleForm() {
     if (!submitting && !loadingCategories) {
       setSubmitting(true);
       const newForm = new FormData();
-      newForm.append("title", articleData.title);
-      newForm.append("content", articleData.content);
-      if (articleImage) {
-        newForm.append("image", articleImage);
+      newForm.append("title", albumData.title);
+      newForm.append("content", albumData.content);
+      if (albumImage) {
+        newForm.append("image", albumImage);
       }
-      fetch(`${import.meta.env.VITE_API_BASE_URL}infosphere/articles/`, {
+      fetch(`${import.meta.env.VITE_API_BASE_URL}infosphere/albums/`, {
         method: "POST",
         headers: {
           Authorization: `Token ${state.token}`,
@@ -95,7 +95,7 @@ export default function ArticleForm() {
             fetch(
               `${
                 import.meta.env.VITE_API_BASE_URL
-              }infosphere/article-categories/`,
+              }infosphere/album-categories/`,
               {
                 method: "POST",
                 headers: {
@@ -103,7 +103,7 @@ export default function ArticleForm() {
                   Authorization: `Token ${state.token}`,
                 },
                 body: JSON.stringify({
-                  article: data.id,
+                  album: data.id,
                   category: category.id,
                 }),
               }
@@ -121,7 +121,7 @@ export default function ArticleForm() {
   }
   function handleClosePopup() {
     setShowPopup(false);
-    navigate("/articles");
+    navigate("/albums");
   }
   return (
     <>
@@ -136,7 +136,7 @@ export default function ArticleForm() {
               className="input"
               type="text"
               name="title"
-              value={articleData.title}
+              value={albumData.title}
               onChange={handleInputChange}
             />
           </div>
@@ -147,7 +147,7 @@ export default function ArticleForm() {
             <textarea
               className="textarea"
               name="content"
-              value={articleData.content}
+              value={albumData.content}
               onChange={handleInputChange}
             />
           </div>
