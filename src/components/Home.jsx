@@ -39,7 +39,10 @@ export default function Home() {
     {path: "/profile", label: "profile"},
     {path: "/BuscadorDeCanciones", label: "BuscadorDeCanciones"},
   ];
-
+ //para reveer
+  const addAlbum = () => {
+    navigate("/articles/add");
+  };
   useEffect(() => {
     const fetchAlbumsAndArtists = async () => {
       setIsLoading(true);
@@ -151,76 +154,93 @@ export default function Home() {
         </header>
         <form action="">
         <fieldset>
-          <label style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
-            Título:
-            <input
-              type="text"
-              name="title"
-              style={{
-                marginLeft: "10px",
-                width: "calc(100% - 20px)",
-                padding: "5px",
-                border: "1px solid black",
-              }}
-            />
-          </label>
-          <label style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
-            Artista:
-            <input
-              type="text"
-              name="artist"
-              style={{
-                marginLeft: "10px",
-                width: "calc(100% - 20px)",
-                padding: "5px",
-                border: "1px solid black",
-              }}
-            />
-          </label>
-          <label style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
-            Año:
-            <input
-              type="text"
-              name="year"
-              style={{
-                marginLeft: "10px",
-                width: "calc(100% - 20px)",
-                padding: "5px",
-                border: "1px solid black",
-              }}
-            />
-          </label>
-          <label style={{ flex: 1, color: "#61F2B1" }}>
-            Creado por:
-            <input
-              type="text"
-              name="createdBy"
-              style={{
-                marginLeft: "10px",
-                width: "calc(100% - 20px)",
-                padding: "5px",
-                border: "1px solid black",
-              }}
-            />
-          </label>
-          <button
-            type="submit"
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "#333",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              alignSelf: "flex-end",
-              border: "2px solid black",
-            }}
-          >
-            Buscar
-          </button>
-        </fieldset>
-    </form>
+    <div style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
+    <label>Título: 
+      <input
+        type="text"
+        name="title"
+        style={{
+          marginLeft: "10px",
+          width: "calc(100% - 20px)",
+          padding: "5px",
+          border: "1px solid black",
+        }}
+      />
+      </label>
+    <label>Artista:
+      <input
+        type="text"
+        name="artist"
+        style={{
+          marginLeft: "10px",
+          width: "calc(100% - 20px)",
+          padding: "5px",
+          border: "1px solid black",
+        }}
+      />
+    </label>
+    <label > Año:
+      <input
+        type="text"
+        name="year"
+        style={{
+          marginLeft: "10px",
+          width: "calc(100% - 20px)",
+          padding: "5px",
+          border: "1px solid black",
+        }}
+      />
+    </label>
+    <label >
+      Creado por:
+      <input
+        type="text"
+        name="createdBy"
+        style={{
+          marginLeft: "10px",
+          width: "calc(100% - 20px)",
+          padding: "5px",
+          border: "1px solid black",
+        }}
+      />
+    </label>
+    </div>
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <button
+      type="submit"
+      style={{
+        marginTop: "20px",
+        padding: "10px 20px",
+        backgroundColor: "#333",
+        color: "#61F2B1",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        alignSelf: "flex-end",
+        border: "2px solid black",
+      }}
+    >
+      Buscar
+    </button>
+    <button onClick={addAlbum}
+        type="submit"
+        style={{
+          marginTop: "20px",
+          padding: "10px 20px",
+          backgroundColor: "#333",
+          color: "#61F2B1",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          alignSelf: "flex-end",
+          border: "2px solid black",
+        }}
+      >
+        Agregar album
+      </button>
+      </div>
+  </fieldset>
+</form>
 
         <div>
           <TableContainer component={Paper}>
@@ -292,5 +312,5 @@ export default function Home() {
         </div>
       </main>
     </div>
-  );
+  ); 
 }
