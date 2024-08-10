@@ -147,7 +147,7 @@ export default function Home() {
           }}
         >
           <h1 style={{ color: "#61F2B1", fontSize: "24px", fontWeight: "bold"}}>Home</h1>
-          <button style={{ color: "#61F2B1", fontWeight: "bold" }} onClick={handleLogout}>Cerrar Sesión</button>
+          <button style={{  marginTop: "20px", padding: "10px 20px", backgroundColor: "#333", color: "#61F2B1", border: "none",  borderRadius: "5px", cursor: "#61F2B1", alignSelf: "flex-end", border: "2px solid black", }} onClick={handleLogout}>Cerrar Sesión</button>
         </header>
         <form action="">
         <fieldset>
