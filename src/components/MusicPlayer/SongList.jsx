@@ -1,5 +1,7 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import SongCard from "./SongCard";
+import PopupAlbum from "../popup/PopupAlbum"; // Ajusta la ruta según la estructura de tu proyecto
 
 function SongList() {
   const [page, setPage] = useState(1);
@@ -8,9 +10,12 @@ function SongList() {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({});
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [selectedAlbum, setSelectedAlbum] = useState(null);
 
   const observerRef = useRef();
   const lastSongElementRef = useRef();
+  const navigate = useNavigate();
 
   const doFetch = async () => {
     setIsLoading(true);
@@ -42,23 +47,18 @@ function SongList() {
   }, [page, filters]);
 
   useEffect(() => {
-    // Si la petición esta en proceso no creamos observador
     if (isLoading) return;
 
-    // Si hay otro observador definido lo desuscribimos
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
 
-    // Creamos y referenciamos el observador de tarjetas actual
     observerRef.current = new IntersectionObserver((cards) => {
-      // Observamos todas las tarjetas de la nueva página cargada
       if (cards[0].isIntersecting && nextUrl) {
         setPage((prevPage) => prevPage + 1);
       }
     });
 
-    // Actualizamos la referencia al última tarjeta
     if (lastSongElementRef.current) {
       observerRef.current.observe(lastSongElementRef.current);
     }
@@ -82,50 +82,77 @@ function SongList() {
     setPage(1);
   }
 
+  function handleBack() {
+    navigate("/home");
+  }
+
+  function handleAdd() {
+    setSelectedAlbum({ title: "", year: "", artist: "", artistName: "" });
+    setIsPopupVisible(true);
+  }
+
+  function handlePopupClose(formData) {
+    setIsPopupVisible(false);
+    if (formData) {
+      // Lógica para agregar el nuevo álbum
+      console.log("Nuevo álbum agregado:", formData);
+    }
+  }
+
   if (isError) return <p>Error al cargar las canciones.</p>;
   if (!songs.length && !isLoading) return <p>No hay canciones disponibles</p>;
 
   return (
-    <div>
+    <div style={{ backgroundColor: "hsl(141, 100%, 82%)", padding: "20px" }}>
       <div className="my-5">
         <h2 className="title">Lista de Canciones</h2>
         <form className="box" onSubmit={handleSearch}>
-          <div className="field">
-            <label className="label">Título:</label>
+          <div className="field is-grouped">
             <div className="control">
+              <label className="label">Título:</label>
               <input className="input" type="text" name="title" />
             </div>
-          </div>
-          <div className="field">
-            <label className="label">Artista:</label>
             <div className="control">
-              <input className="input" type="number" name="artists" />
+              <label className="label">Álbum:</label>
+              <input className="input" type="text" name="album" />
             </div>
           </div>
-          <div className="field">
-            <label className="label">Fecha de inicio:</label>
+          <div className="field is-grouped">
             <div className="control">
-              <input
-                className="input"
-                type="datetime-local"
-                name="created_at_min"
-              />
+              <label className="label">Artista:</label>
+              <input className="input" type="text" name="artist" />
+            </div>
+            <div className="control">
+              <label className="label">Género:</label>
+              <input className="input" type="text" name="genre" />
             </div>
           </div>
-          <div className="field">
-            <label className="label">Fecha de fin:</label>
+          <div className="field is-grouped">
             <div className="control">
-              <input
-                className="input"
-                type="datetime-local"
-                name="created_at_max"
-              />
+              <label className="label">Año:</label>
+              <input className="input" type="text" name="year" />
+            </div>
+            <div className="control">
+              <label className="label">Creado por:</label>
+              <input className="input" type="text" name="created_by" />
             </div>
           </div>
-          <div className="field">
-            <button className="button is-primary" type="submit">
-              Buscar
-            </button>
+          <div className="field is-grouped">
+            <div className="control">
+              <button className="button is-primary" type="submit" style={{ marginRight: "10px" }}>
+                Buscar
+              </button>
+            </div>
+            <div className="control">
+              <button className="button is-success" type="button" onClick={handleAdd} style={{ marginRight: "10px" }}>
+                Agregar
+              </button>
+            </div>
+            <div className="control">
+              <button className="button is-warning" type="button" onClick={handleBack}>
+                Atrás
+              </button>
+            </div>
           </div>
         </form>
         <ul>
@@ -151,6 +178,9 @@ function SongList() {
         </ul>
         {isLoading && <p>Cargando más canciones...</p>}
       </div>
+      {isPopupVisible && (
+        <PopupAlbum album={selectedAlbum} onClose={handlePopupClose} />
+      )}
     </div>
   );
 }
