@@ -5,16 +5,16 @@ import PopupSongs from "../popup/PopupSongs";
 
 function ArtistList() {
   const [page, setPage] = useState(1);
-  const [songs, setSongs] = useState([]);
+  const [artists, setArtists] = useState([]);
   const [nextUrl, setNextUrl] = useState(null);
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({});
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [selectedAlbum, setSelectedAlbum] = useState(null);
+  const [selectedArtist, setSelectedArtist] = useState(null);
 
   const observerRef = useRef();
-  const lastSongElementRef = useRef();
+  const lastArtistElementRef = useRef();
   const navigate = useNavigate();
 
   const doFetch = async () => {
@@ -59,8 +59,8 @@ function ArtistList() {
       }
     });
 
-    if (lastSongElementRef.current) {
-      observerRef.current.observe(lastSongElementRef.current);
+    if (lastArtistElementRef.current) {
+      observerRef.current.observe(lastArtistElementRef.current);
     }
   }, [isLoading, nextUrl]);
 
@@ -78,7 +78,7 @@ function ArtistList() {
     });
 
     setFilters(newFilters);
-    setSongs([]);
+    setArtists([]);
     setPage(1);
   }
 
@@ -96,8 +96,8 @@ function ArtistList() {
    
   }
 
-  if (isError) return <p>Error al cargar las canciones.</p>;
-  if (!songs.length && !isLoading) return <p>No hay canciones disponibles</p>;
+  if (isError) return <p>Error al cargar los artistas.</p>;
+  if (!artists.length && !isLoading) return <p>No hay artistas disponibles</p>;
 
   return (
     <div style={{ backgroundColor: "hsl(141, 100%, 82%)", padding: "20px" }}>
@@ -111,23 +111,23 @@ function ArtistList() {
             </div>
             <div className="control">
               <label className="label">Biografia:</label>
-              <input className="input" type="text" name="album" />
+              <input className="input" type="text" name="bio" />
             </div>
           </div>
           <div className="field is-grouped">
             <div className="control">
               <label className="label">Página web:</label>
-              <input className="input" type="text" name="artist" />
+              <input className="input" type="text" name="website" />
             </div>
             <div className="control">
               <label className="label">Fecha de creación a partir de:</label>
-              <input className="input" type="text" name="genre" />
+              <input className="input" type="text" name="created_at_min" />
             </div>
           </div>
           <div className="field is-grouped">
             <div className="control">
               <label className="label">Fecha de creacion hasta:</label>
-              <input className="input" type="text" name="year" />
+              <input className="input" type="text" name="created_at_max" />
             </div>
           </div>
           <div className="field is-grouped">
@@ -149,33 +149,34 @@ function ArtistList() {
           </div>
         </form>
         <ul>
-          {songs.map((song, index) => {
-            if (songs.length === index + 1) {
+          {artists.map((artist, index) => {
+            if (artists.length === index + 1) {
               return (
                 <div
-                  key={song.id}
-                  ref={lastSongElementRef}
+                  key={artist.id}
+                  ref={lastArtistElementRef}
                   className="column is-two-thirds"
                 >
-                  <SongCard song={song} />
+                  <ArtistCard artist={artist} />
                 </div>
               );
-            } else {
-              return (
-                <div key={song.id} className="column is-two-thirds">
-                  <SongCard song={song} />
-                </div>
-              );
+            // } else {
+            //   return (
+            //     <div key={artist.id} className="column is-two-thirds">
+            //       <ArtistCard artist={artist} />
+            //     </div>
+            //   );
             }
           })}
         </ul>
-        {isLoading && <p>Cargando más canciones...</p>}
+        {isLoading && <p>Cargando más artistas...</p>}
       </div>
       {isPopupVisible && (
-        <PopupSongs onClose={handlePopupClose}/>
+        //crear popup artists
+        <PopupArtists onClose={handlePopupClose}/>
       )}
     </div>
   );
 }
 
-export default SongList;
+export default ArtistList;
