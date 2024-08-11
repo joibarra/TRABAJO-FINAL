@@ -38,12 +38,12 @@ export default function Albums() {
   const menuItems = [
     {path: "/albums", label: "Album"},
     {path: "/songs", label: "Canciones"},
-    {path: "/artists", label: "Artistas"},
+    {path: "/ArtistList", label: "Artistas"},
   //  {path: "/BuscadorDeCanciones", label: "BuscadorDeCanciones"},
   ];
  //para reveer
   const addAlbum = () => {
-    console.log("entro a addalbum")
+    console.log("entro a album")
    setShowPopupCreate(true);
   };
   function handleSearch(event) {
@@ -126,7 +126,7 @@ export default function Albums() {
     }).then((response) => {
       if (!response.ok) {
         setShowPopup(true);
-        setMessage("Las credenciales de autenticación no se proveyeron.");
+        setMessage("¿Seguro que desea eliminar el album?.");
       } else {
         setShowPopup(true);
         setMessage("El album fue eliminado.");
