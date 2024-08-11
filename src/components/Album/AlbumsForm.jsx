@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import {useAuth} from "../../contexts/AuthContext";
 import {useNavigate} from "react-router-dom";
 import PopupMsj from "../popup/PopupMsj";
+import PopupCreateAlbum from "../popup/PopupCreateAlbum";
 
 export default function AlbumForm() {
   const [albumData, setAlbumData] = useState({title: "", content: ""});
@@ -17,10 +18,10 @@ export default function AlbumForm() {
 
   useEffect(
     () => {
-      fetch(`${import.meta.env.VITE_API_BASE_URL}infosphere/categories/`)
+      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/album/`)
         .then((response) => {
           if (!response.ok) {
-            throw new Error("No se puedieron cargar las categorías");
+            throw new Error("No se cargaron los albumes");
           }
           return response.json();
         })
@@ -142,7 +143,7 @@ export default function AlbumForm() {
           </div>
         </div>
         <div className="field">
-          <label className="label">Contenido</label>
+          <label className="label">Año</label>
           <div className="control">
             <textarea
               className="textarea"
@@ -153,13 +154,13 @@ export default function AlbumForm() {
           </div>
         </div>
         <div className="field">
-          <label className="label">Imagen:</label>
+          <label className="label">fecha de creación a partir de : </label>
           <div className="control">
-            <input
-              className="input"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
+          <textarea
+              className="textarea"
+              name="content"
+              value={albumData.content}
+              onChange={handleInputChange}
             />
           </div>
         </div>
@@ -193,8 +194,8 @@ export default function AlbumForm() {
         </div>
       </form>
       {showPopup && (
-        <PopupMsj
-          message="Se creó correctamente el artículo"
+        <PopupCreateAlbum
+          
           onClose={handleClosePopup}
         />
       )}

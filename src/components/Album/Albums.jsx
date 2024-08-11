@@ -17,6 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PopupAlbum from "../popup/PopupAlbum";
 import { useAuth } from "../../contexts/AuthContext";
 import PopupMsj from "../popup/PopupMsj";
+import PopupCreateAlbum from "../popup/PopupCreateAlbum";
 
 export default function Albums() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export default function Albums() {
   const [albums, setAlbums] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showPopupAlbum, setShowPopupAlbum] = useState(false);
+  const [showPopupCreate, setShowPopupCreate] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedAlbum, setSelectedAlbum] = useState();
   const handleLogout = () => {
@@ -41,8 +43,26 @@ export default function Albums() {
   ];
  //para reveer
   const addAlbum = () => {
-    navigate("/albums/add");
+    console.log("entro a addalbum")
+   setShowPopupCreate(true);
   };
+  function handleSearch(event) {
+    event.preventDefault();
+
+    const searchForm = new FormData(event.target);
+
+    const newFilters = {};
+
+    searchForm.forEach((value, key) => {
+      if (value) {
+        newFilters[key] = value;
+      }
+    });
+
+    setFilters(newFilters);
+    setSongs([]);
+    setPage(1);
+  }
   useEffect(() => {
     const fetchAlbumsAndArtists = async () => {
       setIsLoading(true);
@@ -122,6 +142,11 @@ export default function Albums() {
 
   function handleClosePopup() {
     setShowPopup(false);
+  }
+
+  function handlePopupCreate (){
+    console.log("entro a handlePopupCreate ")
+    setShowPopupCreate (true);
   }
 
   function handleClosePopupAlbum() {
@@ -207,7 +232,7 @@ export default function Albums() {
     </div>
     <div style={{ display: "flex", justifyContent: "space-between" }}>
     <button
-      type="submit"
+      onClick={handleSearch}
       style={{
         marginTop: "20px",
         padding: "10px 20px",
@@ -223,7 +248,6 @@ export default function Albums() {
       Buscar
     </button>
     <button onClick={addAlbum}
-        type="submit"
         style={{
           marginTop: "20px",
           padding: "10px 20px",
@@ -239,6 +263,7 @@ export default function Albums() {
         Agregar album
       </button>
       </div>
+     
   </fieldset>
 </form>
 
@@ -309,6 +334,7 @@ export default function Albums() {
           {showPopup && (
             <PopupMsj message={message} onClose={handleClosePopup} />
           )}
+          
         </div>
       </main>
     </div>
