@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import PopupSongs from "../popup/PopupSongs";
 
-function ArtistList() {
+export default function ArtistList() {
   const [page, setPage] = useState(1);
   const [artists, setArtists] = useState([]);
   const [nextUrl, setNextUrl] = useState(null);
@@ -160,12 +160,12 @@ function ArtistList() {
                   <ArtistCard artist={artist} />
                 </div>
               );
-            // } else {
-            //   return (
-            //     <div key={artist.id} className="column is-two-thirds">
-            //       <ArtistCard artist={artist} />
-            //     </div>
-            //   );
+            } else {
+              return (
+                <div key={artist.id} className="column is-two-thirds">
+                  <ArtistCard artist={artist} />
+                </div>
+              );
             }
           })}
         </ul>
@@ -179,4 +179,3 @@ function ArtistList() {
   );
 }
 
-export default ArtistList;
