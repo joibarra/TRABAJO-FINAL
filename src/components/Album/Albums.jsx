@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -15,9 +15,10 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PopupAlbum from "../popup/PopupAlbum";
-import { useAuth } from "../../contexts/AuthContext";
+import {useAuth} from "../../contexts/AuthContext";
 import PopupMsj from "../popup/PopupMsj";
 import PopupCreateAlbum from "../popup/PopupCreateAlbum";
+import PopupViewAlbum from "../popup/PopupViewAlbum";
 
 export default function Albums() {
   const navigate = useNavigate();
@@ -30,20 +31,25 @@ export default function Albums() {
   const [showPopupCreate, setShowPopupCreate] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedAlbum, setSelectedAlbum] = useState();
+  const [filters, setFilters] = useState({});
+  const [page, setPage] = useState(1);
+  const [nextUrl, setNextUrl] = useState(null);
+  const [idAlbumDelete, setIdAlbumDelete] = useState();
+  const [showPopupAlter, setShowPopupAlter] = useState(false);
+  const [showPopupViewAlbum, setShowPopupViewAlbum] = useState(false);
+
   const handleLogout = () => {
     // Lógica para cerrar sesión
     navigate("/");
   };
   // Definir las rutas de menú manualmente si no están bajo un padre común
   const menuItems = [
-    { path: "/albums", label: "Album" },
-    { path: "/songs", label: "Canciones" },
-    { path: "/ArtistList", label: "Artistas" },
+    {key: 1, path: "/albums", label: "Album"},
+    {key: 2, path: "/songs", label: "Canciones"},
+    {key: 3, path: "/ArtistList", label: "Artistas"},
     //  {path: "/BuscadorDeCanciones", label: "BuscadorDeCanciones"},
   ];
-  //para reveer
   const addAlbum = () => {
-    console.log("entro a album");
     setShowPopupCreate(true);
   };
   function handleSearch(event) {
@@ -52,7 +58,6 @@ export default function Albums() {
     const searchForm = new FormData(event.target);
 
     const newFilters = {};
-
     searchForm.forEach((value, key) => {
       if (value) {
         newFilters[key] = value;
@@ -60,10 +65,39 @@ export default function Albums() {
     });
 
     setFilters(newFilters);
-    setSongs([]);
+    setAlbums([]);
     setPage(1);
   }
+
+  const doFetch = async () => {
+    setIsLoading(true);
+    let query = new URLSearchParams({
+      page: page,
+      page_size: 5,
+      ordering: `-created_at`,
+      ...filters,
+    }).toString();
+    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/?${query}`, {})
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.results) {
+          setAlbums((prevAlbums) => [...prevAlbums, ...data.results]);
+          setNextUrl(data.next);
+        }
+      })
+      .catch(() => {
+        setIsError(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
   useEffect(() => {
+    doFetch();
+  }, [page, filters]);
+
+  useEffect(() => {
+    setShowPopupAlter(false);
     const fetchAlbumsAndArtists = async () => {
       setIsLoading(true);
       try {
@@ -94,7 +128,7 @@ export default function Albums() {
                 }
               );
               const artistData = await artistResponse.json();
-              return { ...album, artistName: artistData.name };
+              return {...album, artistName: artistData.name};
             })
           );
           setAlbums(albumsWithArtists);
@@ -105,52 +139,68 @@ export default function Albums() {
         setIsLoading(false);
       }
     };
-
     fetchAlbumsAndArtists();
   }, [state.token]);
 
   const handleEdit = (album) => {
-    console.log("album", album);
     setSelectedAlbum(album);
     setShowPopupAlbum(true);
   };
 
   const handleDelete = (id) => {
-    console.log(`Delete album with id: ${id}`);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/${id}/`, {
-      method: "DELETE",
-      headers: {
-        accept: "application/json",
-        Authorization: `Token ${state.token}`,
-      },
-    }).then((response) => {
-      if (!response.ok) {
-        setShowPopup(true);
-        setMessage("¿Seguro que desea eliminar el album?.");
-      } else {
-        setShowPopup(true);
-        setMessage("El album fue eliminado.");
-      }
-    });
+    setShowPopupAlter(false);
+    setIdAlbumDelete(id);
+    setShowPopup(true);
+    setMessage("¿Seguro que desea eliminar el album?.");
   };
 
   const handleView = (album) => {
     console.log(`View album with id: ${album}`);
-    setShowPopupAlbum(true);
-    // Implementa la lógica de visualización aquí
+    setSelectedAlbum(album);
+    setShowPopupViewAlbum(true);
   };
+
+  function handleConfigPopup() {
+    if (!showPopupAlter) {
+      fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }harmonyhub/albums/${idAlbumDelete}/`,
+        {
+          method: "DELETE",
+          headers: {
+            accept: "application/json",
+            Authorization: `Token ${state.token}`,
+          },
+        }
+      ).then((response) => {
+        if (!response.ok) {
+          setShowPopup(true);
+          setMessage("Sólo el propietario puede eliminar este álbum.");
+          setShowPopupAlter(true);
+        } else {
+          setShowPopup(true);
+          setMessage("El album fue eliminado.");
+          setShowPopupAlter(true);
+        }
+      });
+    } else {
+      setShowPopup(false);
+    }
+  }
 
   function handleClosePopup() {
     setShowPopup(false);
   }
-
-  function handlePopupCreate() {
-    console.log("entro a handlePopupCreate ");
-    setShowPopupCreate(true);
-  }
-
   function handleClosePopupAlbum() {
     setShowPopupAlbum(false);
+  }
+
+  function handleClosePopupCreate() {
+    setShowPopupCreate(false);
+  }
+  function handleClosePopupViewAlbum() {
+    setShowPopupViewAlbum(false);
   }
 
   return (
@@ -166,19 +216,21 @@ export default function Albums() {
           </ul>
         </nav>
       </aside>
-      <main style={{ flex: 1, background: "#222222", padding: "10px" }}>
+      <main style={{flex: 1, background: "#222222", padding: "10px"}}>
         <header
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            marginBottom: "10px",
           }}
         >
           <h1
             style={{
               color: "#61F2B1",
-              fontSize: "24px",
+              fontSize: "40px",
               fontWeight: "bold",
+              marginLeft: "15px",
             }}
           >
             Albums
@@ -200,65 +252,37 @@ export default function Albums() {
             Cerrar Sesión
           </button>
         </header>
-        <form action="">
-          <fieldset>
-            <div style={{ flex: 1, marginRight: "10px", color: "#61F2B1" }}>
-              <label>
-                Título:
-                <input
-                  type="text"
-                  name="title"
-                  style={{
-                    marginLeft: "10px",
-                    width: "calc(100% - 20px)",
-                    padding: "5px",
-                    border: "1px solid black",
-                  }}
-                />
-              </label>
-              <label>
-                Artista:
-                <input
-                  type="text"
-                  name="artist"
-                  style={{
-                    marginLeft: "10px",
-                    width: "calc(100% - 20px)",
-                    padding: "5px",
-                    border: "1px solid black",
-                  }}
-                />
-              </label>
-              <label>
-                Año:
-                <input
-                  type="text"
-                  name="year"
-                  style={{
-                    marginLeft: "10px",
-                    width: "calc(100% - 20px)",
-                    padding: "5px",
-                    border: "1px solid black",
-                  }}
-                />
-              </label>
-              <label>
-                Creado por:
-                <input
-                  type="text"
-                  name="createdBy"
-                  style={{
-                    marginLeft: "10px",
-                    width: "calc(100% - 20px)",
-                    padding: "5px",
-                    border: "1px solid black",
-                  }}
-                />
-              </label>
+        <form className="box" onSubmit={handleSearch}>
+          <div
+            style={{
+              display: "flex",
+              color: "#61F2B1",
+              justifyContent: "space-around",
+            }}
+          >
+            <div className="control">
+              <label className="label">Título:</label>
+              <input className="input" type="text" name="title" />
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div className="control">
+              <label className="label">Artista:</label>
+              <input className="input" type="text" name="<artist>" />
+            </div>
+            <div className="control">
+              <label className="label">Año:</label>
+              <input className="input" type="text" name="year" />
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-around",
+              marginBottom: "15px",
+            }}
+          >
+            <div className="control">
               <button
-                onClick={handleSearch}
+                type="submit"
                 style={{
                   marginTop: "20px",
                   padding: "10px 20px",
@@ -273,7 +297,10 @@ export default function Albums() {
               >
                 Buscar
               </button>
+            </div>
+            <div className="control">
               <button
+                type="button"
                 onClick={addAlbum}
                 style={{
                   marginTop: "20px",
@@ -290,7 +317,7 @@ export default function Albums() {
                 Agregar album
               </button>
             </div>
-          </fieldset>
+          </div>
         </form>
 
         <div>
@@ -357,8 +384,21 @@ export default function Albums() {
           {showPopupAlbum && (
             <PopupAlbum album={selectedAlbum} onClose={handleClosePopupAlbum} />
           )}
+          {showPopupViewAlbum && (
+            <PopupViewAlbum
+              album={selectedAlbum}
+              onClose={handleClosePopupViewAlbum}
+            />
+          )}
           {showPopup && (
-            <PopupMsj message={message} onClose={handleClosePopup} />
+            <PopupMsj
+              message={message}
+              onConfirm={handleConfigPopup}
+              onClose={handleClosePopup}
+            />
+          )}
+          {showPopupCreate && (
+            <PopupCreateAlbum onClose={handleClosePopupCreate} />
           )}
         </div>
       </main>

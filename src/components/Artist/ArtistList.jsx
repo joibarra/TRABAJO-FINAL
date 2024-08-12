@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-
-import PopupSongs from "../popup/PopupSongs";
+import React, {useEffect, useState, useRef} from "react";
+import {useNavigate} from "react-router-dom";
+import ArtistCard from "./ArtistCard";
 
 export default function ArtistList() {
   const [page, setPage] = useState(1);
@@ -26,7 +25,10 @@ export default function ArtistList() {
       ...filters,
     }).toString();
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artist/?${query}`, {})
+    fetch(
+      `${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/?${query}`,
+      {}
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.results) {
@@ -87,23 +89,28 @@ export default function ArtistList() {
   }
 
   function handleAdd() {
-    setSelectedArtist({ name: "", bio: "", website: "", created_at_min: "", created_at_max: "" });
+    setSelectedArtist({
+      name: "",
+      bio: "",
+      website: "",
+      created_at_min: "",
+      created_at_max: "",
+    });
     setIsPopupVisible(true);
   }
 
   function handlePopupClose() {
     setIsPopupVisible(false);
-   
   }
 
   if (isError) return <p>Error al cargar los artistas.</p>;
   if (!artists.length && !isLoading) return <p>No hay artistas disponibles</p>;
 
   return (
-    <div style={{ backgroundColor: "hsl(141, 100%, 82%)", padding: "20px" }}>
+    <div style={{backgroundColor: "hsl(141, 100%, 82%)", padding: "20px"}}>
       <div className="my-5">
         <h2 className="title">Lista de artistas</h2>
-        <form className="box" onSubmit={handleSearch}>
+        <form className="box">
           <div className="field is-grouped">
             <div className="control">
               <label className="label">Nombre:</label>
@@ -132,17 +139,31 @@ export default function ArtistList() {
           </div>
           <div className="field is-grouped">
             <div className="control">
-              <button className="button is-primary" type="submit" style={{ marginRight: "10px" }}>
+              <button
+                className="button is-primary"
+                type="button"
+                style={{marginRight: "10px"}}
+                onClick={handleSearch}
+              >
                 Buscar
               </button>
             </div>
             <div className="control">
-              <button className="button is-success" type="button" onClick={handleAdd} style={{ marginRight: "10px" }}>
+              <button
+                className="button is-success"
+                type="button"
+                onClick={handleAdd}
+                style={{marginRight: "10px"}}
+              >
                 Agregar
               </button>
             </div>
             <div className="control">
-              <button className="button is-warning" type="button" onClick={handleBack}>
+              <button
+                className="button is-warning"
+                type="button"
+                onClick={handleBack}
+              >
                 Atrás
               </button>
             </div>
@@ -155,14 +176,14 @@ export default function ArtistList() {
                 <div
                   key={artist.id}
                   ref={lastArtistElementRef}
-                  className="column is-two-thirds"
+                  className="column"
                 >
                   <ArtistCard artist={artist} />
                 </div>
               );
             } else {
               return (
-                <div key={artist.id} className="column is-two-thirds">
+                <div key={artist.id} className="column">
                   <ArtistCard artist={artist} />
                 </div>
               );
@@ -173,9 +194,8 @@ export default function ArtistList() {
       </div>
       {isPopupVisible && (
         //crear popup artists
-        <PopupArtists onClose={handlePopupClose}/>
+        <PopupArtists onClose={handlePopupClose} />
       )}
     </div>
   );
 }
-
