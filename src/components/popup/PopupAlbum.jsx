@@ -4,11 +4,11 @@ import {useAuth} from "../../contexts/AuthContext";
 const PopupAlbum = ({album, onClose}) => {
   const state = useAuth("state");
   const [artists, setArtists] = useState([]);
+  const [errorAccept, setErrorAccept] = useState(false);
   const [formData, setFormData] = useState({
     title: album.title,
     year: album.year,
     artist: album.artist,
-    artistName: album.artistName,
   });
 
   const handleChange = (e) => {
@@ -18,10 +18,25 @@ const PopupAlbum = ({album, onClose}) => {
       [name]: value,
     });
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onClose(formData);
+  const OnAccept = (e) => {
+    if (formData && formData.title && formData.year && formData.artist) {
+      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          year: formData.year,
+          artist: formData.artist,
+        }),
+      }).then((response) => {
+        console.log(response.status);
+        if (response.status == 401) {
+          setErrorAccept(true);
+        }
+      });
+    }
   };
 
   useEffect(() => {
@@ -46,7 +61,7 @@ const PopupAlbum = ({album, onClose}) => {
         <div className="modal-background"></div>
         <div className="modal-content">
           <h2 className="title">Album</h2>
-          <form className="box" onSubmit={handleSubmit}>
+          <form className="box">
             <div className="field">
               <label className="label">Título:</label>
               <div className="control">
@@ -89,9 +104,32 @@ const PopupAlbum = ({album, onClose}) => {
                 </div>
               </div>
             </div>
-            <div className="field">
-              <button className="button is-primary" type="submit">
+            <div style={{marginBottom: "10px"}}>
+              {errorAccept && (
+                <p>
+                  No puede insertar album! Las credenciales de autenticación no
+                  se proveyeron.
+                </p>
+              )}
+            </div>
+
+            <div
+              className="field"
+              style={{display: "flex", justifyContent: "space-between"}}
+            >
+              <button
+                className="button is-primary"
+                type="button"
+                onClick={OnAccept}
+              >
                 Aceptar
+              </button>
+              <button
+                className="button is-primary"
+                type="button"
+                onClick={onClose}
+              >
+                Cerrar
               </button>
             </div>
           </form>
@@ -102,4 +140,3 @@ const PopupAlbum = ({album, onClose}) => {
 };
 
 export default PopupAlbum;
-
