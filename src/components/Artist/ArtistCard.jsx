@@ -1,14 +1,17 @@
 import React from "react";
 
 function ArtistCard ({artist}){
+    useEffect(() => {
+        console.log("Artist", artist);
+      });
     return (
         <div className={`card has-background-dark`}>
             <div className="card-content">
-                <div className="media">
-                    <div className="media-content">
-                        <p className={`title is-4 has-text-white`}>
-                            {song.title}
-                        </p>
+             <div className="control"> 
+                 <div className="media-content">
+                        <p className={`title is-4 has-text-white`}>{artist.name}</p>
+
+                            
                     </div>
                 </div>
             </div>
