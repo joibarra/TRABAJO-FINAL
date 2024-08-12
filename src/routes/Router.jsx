@@ -8,7 +8,7 @@ import Album from "../components/Album/Albums";
 import BuscadorDeCanciones from "../components/BuscadorDeCanciones"; // Asegúrate de que la ruta de importación sea correcta
 import Login from "../components/Auth/Login";
 import Albums from "../components/Album/Albums";
-import ArtistList from "../components/Artist/ArtistList";
+import ArtistList from "../components/Artist/ArtistList"; // Importa el componente ArtistList
 
 const routes = [
   {
@@ -60,8 +60,8 @@ const routes = [
         ),
       },
       {
-        path: "artist",
-        element: <ArtistList />,
+        path: "ArtistList",
+        element: <ArtistList />, // Define la ruta para ArtistList
       },
       {
         path: "BuscadorDeCanciones", // Agrega la ruta para BuscadorDeCanciones

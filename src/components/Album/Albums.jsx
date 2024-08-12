@@ -204,10 +204,10 @@ export default function Albums() {
   }
 
   return (
-    <div style={{display: "flex", height: "100vh"}}>
-      <aside style={{width: "200px", background: "#A5FFC9", padding: "10px"}}>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <aside style={{ width: "200px", background: "#A5FFC9", padding: "10px" }}>
         <nav>
-          <ul style={{listStyle: "none", padding: 0}}>
+          <ul style={{ listStyle: "none", padding: 0 }}>
             {menuItems.map((item, index) => (
               <li key={index}>
                 <Link to={item.path}>{item.label}</Link>
@@ -405,3 +405,5 @@ export default function Albums() {
     </div>
   );
 }
+              
+ 

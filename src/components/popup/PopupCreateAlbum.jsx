@@ -1,55 +1,60 @@
 import React, {useEffect, useState} from "react";
 import {useAuth} from "../../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 
-const PopupCreateAlbum = ({ onClose}) =>{
+const PopupCreateAlbum = ({onClose}) => {
   const state = useAuth("state");
-  const [songs, setSongs] = useState([]);
-  const navigate=useNavigate()
+  const [artists, setArtists] = useState([]);
+  const [errorAccept, setErrorAccept] = useState(false);
   const [formData, setFormData] = useState({
-    title: songs.title,
-    year: songs.year,
-    album: songs.id,
-    
+    title: artists.title,
+    year: artists.year,
+    artist: artists.id,
   });
   const handleChange = (e) => {
     const {name, value} = e.target;
-    console.log(name,value)
+    console.log(name, value);
     setFormData({
       ...formData,
       [name]: value,
     });
-    console.log(formData)
+    console.log(formData);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onClose(formData);
+  const onAccept = () => {
+    if (formData.title && formData.year) {
+      console.log(formData);
+      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          year: formData.year,
+          artist: formData.artist,
+        }),
+      }).then((response) => {
+        console.log(response.status);
+        if (response.status == 401) {
+          setErrorAccept(true);
+        }
+      });
+    }
   };
-  const onAccept=()=>{
-  fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      Authorization: `Token ${state.token}`,
-    },body: formData,
-  })}
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
       method: "GET",
       headers: {
-
         accept: "application/json",
         Authorization: `Token ${state.token}`,
       },
-      
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.results) {
-          console.log(data.results)
-          setSongs(data.results);
+          console.log(data.results);
+          setArtists(data.results);
         }
       });
   }, []);
@@ -59,8 +64,8 @@ const PopupCreateAlbum = ({ onClose}) =>{
       <div className="modal is-active">
         <div className="modal-background"></div>
         <div className="modal-content">
-          <h2 className="title">Nueva Cancion</h2>
-          <form className="box" >
+          <h2 className="title">Nuevo Album</h2>
+          <form className="box">
             <div className="field">
               <label className="label">Título:</label>
               <div className="control">
@@ -68,7 +73,6 @@ const PopupCreateAlbum = ({ onClose}) =>{
                   className="input"
                   type="text"
                   name="title"
-                  
                   onChange={handleChange}
                 />
               </div>
@@ -80,38 +84,58 @@ const PopupCreateAlbum = ({ onClose}) =>{
                   className="input"
                   type="number"
                   name="year"
-                  
                   onChange={handleChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label className="label">Albums:</label>
+              <label className="label">Artista:</label>
               <div className="control">
                 <div className="select">
-                  <select
-                    name="album"
-                    
-                    onChange={handleChange}
-                  >
-                    {songs.map((song) => (
-                      <option key={song.id} value={song.id}>
-                        {song.title}
+                  <select name="artist" onChange={handleChange}>
+                    {artists.map((artists) => (
+                      <option key={artists.id} value={artists.id}>
+                        {artists.title}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
             </div>
-            <div className="field"style={{ display: "flex", justifyContent: "space-between" }}>
-              <button onClick={onAccept}className="button is-primary" type="submit">
-                Aceptar
-              </button>
-            
-              <button  onClick={onClose} className="button is-primary" type="submit">
-                Cancelar
-              </button>
+            <div
+              className="field"
+              style={{display: "flex", justifyContent: "space-between"}}
+            >
+              <div>
+                {" "}
+                <button
+                  onClick={onAccept}
+                  className="button is-primary"
+                  type="button"
+                >
+                  Aceptar
+                </button>
               </div>
+              <div>
+                {" "}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="button is-primary"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+            {(!formData.title || !formData.year) && (
+              <p>Inserte titulo y año del album.</p>
+            )}
+            {errorAccept && (
+              <p>
+                No puede insertar album! Las credenciales de autenticación no se
+                proveyeron.
+              </p>
+            )}
           </form>
         </div>
       </div>
