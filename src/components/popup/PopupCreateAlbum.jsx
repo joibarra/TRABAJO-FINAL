@@ -27,6 +27,7 @@ const PopupCreateAlbum = ({onClose}) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Token ${state.token}`,
         },
         body: JSON.stringify({
           title: formData.title,
@@ -37,7 +38,7 @@ const PopupCreateAlbum = ({onClose}) => {
         console.log(response.status);
         if (response.status == 401) {
           setErrorAccept(true);
-        }
+        }else onClose ()
       });
     }
   };
