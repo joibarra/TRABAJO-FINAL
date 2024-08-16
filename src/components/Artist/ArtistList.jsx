@@ -2,7 +2,7 @@ import React, {useEffect, useState, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 import ArtistCard from "./ArtistCard";
 
-export default function ArtistList() {
+function ArtistList() {
   const [page, setPage] = useState(1);
   const [artists, setArtists] = useState([]);
   const [nextUrl, setNextUrl] = useState(null);
@@ -10,8 +10,7 @@ export default function ArtistList() {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({});
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [selectedArtist, setSelectedArtist] = useState(null);
-
+  const [refresh, setRefresh] = useState(false);
   const observerRef = useRef();
   const lastArtistElementRef = useRef();
   const navigate = useNavigate();
@@ -46,7 +45,7 @@ export default function ArtistList() {
 
   useEffect(() => {
     doFetch();
-  }, [page, filters]);
+  }, [page, filters, refresh]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -68,7 +67,7 @@ export default function ArtistList() {
 
   function handleSearch(event) {
     event.preventDefault();
-
+    console.log(event.target);
     const searchForm = new FormData(event.target);
 
     const newFilters = {};
@@ -89,18 +88,13 @@ export default function ArtistList() {
   }
 
   function handleAdd() {
-    setSelectedArtist({
-      name: "",
-      bio: "",
-      website: "",
-      created_at_min: "",
-      created_at_max: "",
-    });
     setIsPopupVisible(true);
   }
 
   function handlePopupClose() {
     setIsPopupVisible(false);
+    setArtists([]);
+    setRefresh((prev) => !prev);
   }
 
   if (isError) return <p>Error al cargar los artistas.</p>;
@@ -110,7 +104,7 @@ export default function ArtistList() {
     <div style={{backgroundColor: "hsl(141, 100%, 82%)", padding: "20px"}}>
       <div className="my-5">
         <h2 className="title">Lista de artistas</h2>
-        <form className="box">
+        <form className="box" onSubmit={handleSearch}>
           <div className="field is-grouped">
             <div className="control">
               <label className="label">Nombre:</label>
@@ -141,9 +135,8 @@ export default function ArtistList() {
             <div className="control">
               <button
                 className="button is-primary"
-                type="button"
+                type="submit"
                 style={{marginRight: "10px"}}
-                onClick={handleSearch}
               >
                 Buscar
               </button>
@@ -199,3 +192,4 @@ export default function ArtistList() {
     </div>
   );
 }
+export default ArtistList;
