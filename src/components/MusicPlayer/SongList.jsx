@@ -93,6 +93,8 @@ function SongList() {
 
   function handlePopupClose() {
     setIsPopupVisible(false);
+    setSongs([]);
+    setRefresh((prev) => !prev);
    
   }
 
