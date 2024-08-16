@@ -27,7 +27,6 @@ const PopupCreateAlbum = ({onClose}) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${state.token}`,
         },
         body: JSON.stringify({
           title: formData.title,
@@ -38,7 +37,7 @@ const PopupCreateAlbum = ({onClose}) => {
         console.log(response.status);
         if (response.status == 401) {
           setErrorAccept(true);
-        }else onClose ()
+        }
       });
     }
   };
@@ -47,7 +46,7 @@ const PopupCreateAlbum = ({onClose}) => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
       method: "GET",
       headers: {
-        "Content-type": "application/json",
+        accept: "application/json",
         Authorization: `Token ${state.token}`,
       },
     })

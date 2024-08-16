@@ -20,11 +20,10 @@ const PopupAlbum = ({album, onClose}) => {
   };
   const OnAccept = (e) => {
     if (formData && formData.title && formData.year && formData.artist) {
-      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/${album.id}`, {
+      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${state.token}`,
         },
         body: JSON.stringify({
           title: formData.title,
@@ -44,7 +43,7 @@ const PopupAlbum = ({album, onClose}) => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        accept: "application/json",
         Authorization: `Token ${state.token}`,
       },
     })

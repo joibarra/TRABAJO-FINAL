@@ -106,7 +106,7 @@ export default function Albums() {
           {
             method: "GET",
             headers: {
-              "Content-type": "application/json",
+              accept: "application/json",
               Authorization: `Token ${state.token}`,
             },
           }
@@ -122,7 +122,7 @@ export default function Albums() {
                 {
                   method: "GET",
                   headers: {
-                    "Content-type": "application/json",
+                    accept: "application/json",
                     Authorization: `Token ${state.token}`,
                   },
                 }
@@ -169,7 +169,7 @@ export default function Albums() {
         {
           method: "DELETE",
           headers: {
-            "Content-type": "application/json",
+            accept: "application/json",
             Authorization: `Token ${state.token}`,
           },
         }
@@ -405,4 +405,3 @@ export default function Albums() {
     </div>
   );
 }
-
