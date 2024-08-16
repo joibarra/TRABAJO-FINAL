@@ -74,7 +74,7 @@ export default function AlbumForm() {
       if (albumImage) {
         newForm.append("image", albumImage);
       }
-      fetch(`${import.meta.env.VITE_API_BASE_URL}infosphere/albums/`, {
+      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
         method: "POST",
         headers: {
           Authorization: `Token ${state.token}`,
