@@ -53,7 +53,7 @@ export default function Home() {
           {
             method: "GET",
             headers: {
-              accept: "application/json",
+              "Content-type": "application/json",
               Authorization: `Token ${state.token}`,
             },
           }
@@ -69,7 +69,7 @@ export default function Home() {
                 {
                   method: "GET",
                   headers: {
-                    accept: "application/json",
+                    "Content-type": "application/json",
                     Authorization: `Token ${state.token}`,
                   },
                 }
@@ -101,7 +101,7 @@ export default function Home() {
     fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/${id}/`, {
       method: "DELETE",
       headers: {
-        accept: "application/json",
+        "Content-type": "application/json",
         Authorization: `Token ${state.token}`,
       },
     }).then((response) => {

@@ -44,7 +44,7 @@ const PopupAlbum = ({album, onClose}) => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
       method: "GET",
       headers: {
-        accept: "application/json",
+        "Content-Type": "application/json",
         Authorization: `Token ${state.token}`,
       },
     })

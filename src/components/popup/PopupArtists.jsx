@@ -30,7 +30,7 @@ const PopupArtists = ({ onClose}) =>{
   fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
     method: "POST",
     headers: {
-      accept: "application/json",
+      "Content-type": "application/json",
       Authorization: `Token ${state.token}`,
     },body: formData,
   })}
@@ -40,7 +40,7 @@ const PopupArtists = ({ onClose}) =>{
       method: "GET",
       headers: {
 
-        accept: "application/json",
+        "Content-type": "application/json",
         Authorization: `Token ${state.token}`,
       },
       
