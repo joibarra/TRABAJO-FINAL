@@ -1,54 +1,71 @@
 import React, {useEffect, useState} from "react";
 import {useAuth} from "../../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 
-const PopupArtists = ({ onClose}) =>{
+
+const PopupArtists = ({ onClose}) => {
   const state = useAuth("state");
-  const [songs, setSongs] = useState([]);
-  const navigate=useNavigate()
+  const [artists, setArtists] = useState([]);
+  const [errorAccept, setErrorAccept] = useState(false);
   const [formData, setFormData] = useState({
-    title: artists.title,
-    year: artist.year,
-    album: artists.id,
-    
+    name: artists.name,
+    bio: artists.bio,
+    website: artists.website,
+    image: artists.image
   });
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData ({
+        ...formData,
+        image: file,
+
+      })
+    }
+  }
   const handleChange = (e) => {
     const {name, value} = e.target;
-    console.log(name,value)
     setFormData({
       ...formData,
       [name]: value,
     });
-    console.log(formData)
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onClose(formData);
-  };
   const onAccept=()=>{
-  fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-      Authorization: `Token ${state.token}`,
-    },body: formData,
-  })}
-
+    if (formData.name) {
+      const formDataArtist = new FormData();
+      formDataArtist.append("name", formData.name);
+      formDataArtist.append("bio", formData.bio);
+      formDataArtist.append("website", formData.website);
+      formDataArtist.append("image", formData.image);
+      
+    console.log(formData)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        Authorization: `Token ${state.token}`,
+      },
+      body: formDataArtist
+    }).then((response) => {
+      if (response.ok) {
+        onClose();
+      } else {
+        setErrorAccept(true);
+      }
+    });
+  }
+};
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
       method: "GET",
       headers: {
-
         "Content-type": "application/json",
         Authorization: `Token ${state.token}`,
       },
-      
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.results) {
-          console.log(data.results)
           setArtists(data.results);
         }
       });
@@ -59,56 +76,60 @@ const PopupArtists = ({ onClose}) =>{
       <div className="modal is-active">
         <div className="modal-background"></div>
         <div className="modal-content">
-          <h2 className="title">Nueva Cancion</h2>
+          <h2 style = {{color: "white"}}className="name"> Nuevo Artista</h2>
           <form className="box" >
             <div className="field">
-              <label className="label">Título:</label>
+              <label className="label">Nombre:</label>
               <div className="control">
                 <input
                   className="input"
                   type="text"
-                  name="title"
-                  
+                  name="name"
                   onChange={handleChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label className="label">Año:</label>
+              <label className="label">Biografía:</label>
               <div className="control">
                 <input
                   className="input"
-                  type="number"
-                  name="year"
+                  type="text"
+                  name="bio"
                   
                   onChange={handleChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label className="label">Albums:</label>
+              <label className="label">Página web:</label>
               <div className="control">
-                <div className="select">
-                  <select
-                    name="album"
-                    
+                <input
+                  className="input"
+                  type="url"
+                  name="website"
                     onChange={handleChange}
-                  >
-                    {artists.map((artist) => (
-                      <option key={artist.id} value={artist.id}>
-                        {artist.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  />
               </div>
             </div>
+            <div className="field">
+              <label className="label" htmlFor="image">
+                Imagen:
+              </label>
+              <input
+                className="input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+          />
+            </div>
+ 
             <div className="field"style={{ display: "flex", justifyContent: "space-between" }}>
-              <button onClick={onAccept}className="button is-primary" type="submit">
+              <button onClick={onAccept}className="button is-primary" type="button">
                 Aceptar
               </button>
             
-              <button  onClick={onClose} className="button is-primary" type="submit">
+              <button  onClick={onClose} className="button is-primary" type="button">
                 Cancelar
               </button>
               </div>

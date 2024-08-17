@@ -22,7 +22,7 @@ const PopupViewAlbum = ({album, onClose}) => {
       <div className="modal is-active">
         <div className="modal-background"></div>
         <div className="modal-content">
-          <h2 className="title">Album</h2>
+          <h2 style = {{color: "white"}} className="title">Ver Album</h2>
           <form className="box">
             <div
               style={{

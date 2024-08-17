@@ -61,7 +61,7 @@ const PopupAlbum = ({album, onClose}) => {
       <div className="modal is-active">
         <div className="modal-background"></div>
         <div className="modal-content">
-          <h2 className="title">Album</h2>
+          <h2 style = {{color: "white"}} className="title">Editar Album</h2> 
           <form className="box">
             <div className="field">
               <label className="label">Título:</label>
@@ -81,7 +81,7 @@ const PopupAlbum = ({album, onClose}) => {
                 <input
                   className="input"
                   type="number"
-                  name="artists"
+                  name="year"
                   value={formData.year}
                   onChange={handleChange}
                 />

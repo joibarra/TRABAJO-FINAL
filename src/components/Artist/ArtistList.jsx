@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 import ArtistCard from "./ArtistCard";
+import PopupArtists from "../popup/PopupArtists";
 
 function ArtistList() {
   const [page, setPage] = useState(1);

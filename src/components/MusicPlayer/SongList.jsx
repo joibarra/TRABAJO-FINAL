@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useEffect, useState, useRef} from "react";
+import {useNavigate} from "react-router-dom";
 import SongCard from "./SongCard";
 import PopupSongs from "../popup/PopupSongs";
 
@@ -11,8 +11,7 @@ function SongList() {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({});
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [selectedAlbum, setSelectedAlbum] = useState(null);
-
+  const [refresh, setRefresh] = useState(false);
   const observerRef = useRef();
   const lastSongElementRef = useRef();
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ function SongList() {
 
   useEffect(() => {
     doFetch();
-  }, [page, filters]);
+  }, [page, filters, refresh]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -66,11 +65,8 @@ function SongList() {
 
   function handleSearch(event) {
     event.preventDefault();
-
     const searchForm = new FormData(event.target);
-
     const newFilters = {};
-
     searchForm.forEach((value, key) => {
       if (value) {
         newFilters[key] = value;
@@ -87,22 +83,17 @@ function SongList() {
   }
 
   function handleAdd() {
-    setSelectedAlbum({ title: "", year: "", artist: "", artistName: "" });
     setIsPopupVisible(true);
   }
 
   function handlePopupClose() {
     setIsPopupVisible(false);
     setSongs([]);
-    setRefresh((prev) =>!prev);
-   
+    setRefresh((prev) => !prev); //
   }
 
-  if (isError) return <p>Error al cargar las canciones.</p>;
-  if (!songs.length && !isLoading) return <p>No hay canciones disponibles</p>;
-
   return (
-    <div style={{ backgroundColor: "hsl(141, 100%, 82%)", padding: "20px" }}>
+    <div style={{backgroundColor: "hsl(141, 100%, 82%)", padding: "20px"}}>
       <div className="my-5">
         <h2 className="title">Lista de Canciones</h2>
         <form className="box" onSubmit={handleSearch}>
@@ -138,17 +129,30 @@ function SongList() {
           </div>
           <div className="field is-grouped">
             <div className="control">
-              <button className="button is-primary" type="submit" style={{ marginRight: "10px" }}>
+              <button
+                className="button is-primary"
+                type="submit"
+                style={{marginRight: "10px"}}
+              >
                 Buscar
               </button>
             </div>
             <div className="control">
-              <button className="button is-success" type="button" onClick={handleAdd} style={{ marginRight: "10px" }}>
+              <button
+                className="button is-success"
+                type="button"
+                onClick={handleAdd}
+                style={{marginRight: "10px"}}
+              >
                 Agregar
               </button>
             </div>
             <div className="control">
-              <button className="button is-warning" type="button" onClick={handleBack}>
+              <button
+                className="button is-warning"
+                type="button"
+                onClick={handleBack}
+              >
                 Atrás
               </button>
             </div>
@@ -158,17 +162,13 @@ function SongList() {
           {songs.map((song, index) => {
             if (songs.length === index + 1) {
               return (
-                <div
-                  key={song.id}
-                  ref={lastSongElementRef}
-                  className="column is-two-thirds"
-                >
+                <div key={song.id} ref={lastSongElementRef} className="column">
                   <SongCard song={song} />
                 </div>
               );
             } else {
               return (
-                <div key={song.id} className="column is-two-thirds">
+                <div key={song.id} className="column">
                   <SongCard song={song} />
                 </div>
               );
@@ -177,9 +177,7 @@ function SongList() {
         </ul>
         {isLoading && <p>Cargando más canciones...</p>}
       </div>
-      {isPopupVisible && (
-        <PopupSongs onClose={handlePopupClose}/>
-      )}
+      {isPopupVisible && <PopupSongs onClose={handlePopupClose} />}
     </div>
   );
 }
