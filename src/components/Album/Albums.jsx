@@ -37,7 +37,7 @@ export default function Albums() {
   const [idAlbumDelete, setIdAlbumDelete] = useState();
   const [showPopupAlter, setShowPopupAlter] = useState(false);
   const [showPopupViewAlbum, setShowPopupViewAlbum] = useState(false);
-
+  const [refresh, setRefresh] = useState(false);
   const handleLogout = () => {
     // Lógica para cerrar sesión
     navigate("/");
@@ -94,10 +94,8 @@ export default function Albums() {
   };
   useEffect(() => {
     doFetch();
-  }, [page, filters]);
+  }, [page, filters, refresh]);
 
-  useEffect(() => {
-    setShowPopupAlter(false);
     const fetchAlbumsAndArtists = async () => {
       setIsLoading(true);
       try {
@@ -139,7 +137,8 @@ export default function Albums() {
         setIsLoading(false);
       }
     };
-    fetchAlbumsAndArtists();
+    useEffect(() => {
+      fetchAlbumsAndArtists();
   }, [state.token]);
 
   const handleEdit = (album) => {
@@ -182,6 +181,8 @@ export default function Albums() {
           setShowPopup(true);
           setMessage("El album fue eliminado.");
           setShowPopupAlter(true);
+          setAlbums([]);
+          setRefresh((prev) =>!prev);
         }
       });
     } else {
@@ -194,10 +195,14 @@ export default function Albums() {
   }
   function handleClosePopupAlbum() {
     setShowPopupAlbum(false);
+    setAlbums([]);
+    setRefresh((prev) =>!prev);
   }
 
   function handleClosePopupCreate() {
     setShowPopupCreate(false);
+    setAlbums([]);
+    setRefresh((prev) =>!prev);
   }
   function handleClosePopupViewAlbum() {
     setShowPopupViewAlbum(false);

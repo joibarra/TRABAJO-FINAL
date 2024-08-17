@@ -12,21 +12,19 @@ const PopupCreateAlbum = ({onClose}) => {
   });
   const handleChange = (e) => {
     const {name, value} = e.target;
-    console.log(name, value);
     setFormData({
       ...formData,
       [name]: value,
     });
-    console.log(formData);
   };
 
   const onAccept = () => {
     if (formData.title && formData.year) {
-      console.log(formData);
       fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Token ${state.token}`,
         },
         body: JSON.stringify({
           title: formData.title,
@@ -34,7 +32,7 @@ const PopupCreateAlbum = ({onClose}) => {
           artist: formData.artist,
         }),
       }).then((response) => {
-        console.log(response.status);
+        if (response.ok){onClose()}
         if (response.status == 401) {
           setErrorAccept(true);
         }
@@ -53,7 +51,6 @@ const PopupCreateAlbum = ({onClose}) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.results) {
-          console.log(data.results);
           setArtists(data.results);
         }
       });
