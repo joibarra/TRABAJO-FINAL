@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PopupAlbum from "../popup/PopupAlbum";
-import {useAuth} from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import PopupMsj from "../popup/PopupMsj";
 import PopupCreateAlbum from "../popup/PopupCreateAlbum";
 import PopupViewAlbum from "../popup/PopupViewAlbum";
@@ -39,31 +39,28 @@ export default function Albums() {
   const [showPopupViewAlbum, setShowPopupViewAlbum] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const handleLogout = () => {
-    // Lógica para cerrar sesión
     navigate("/");
   };
-  // Definir las rutas de menú manualmente si no están bajo un padre común
+
   const menuItems = [
-    {key: 1, path: "/albums", label: "Album"},
-    {key: 2, path: "/songs", label: "Canciones"},
-    {key: 3, path: "/ArtistList", label: "Artistas"},
-    //  {path: "/BuscadorDeCanciones", label: "BuscadorDeCanciones"},
+    { key: 1, path: "/albums", label: "Album" },
+    { key: 2, path: "/songs", label: "Canciones" },
+    { key: 3, path: "/ArtistList", label: "Artistas" },
   ];
+
   const addAlbum = () => {
     setShowPopupCreate(true);
   };
+
   function handleSearch(event) {
     event.preventDefault();
-
     const searchForm = new FormData(event.target);
-
     const newFilters = {};
     searchForm.forEach((value, key) => {
       if (value) {
         newFilters[key] = value;
       }
     });
-
     setFilters(newFilters);
     setAlbums([]);
     setPage(1);
@@ -71,33 +68,44 @@ export default function Albums() {
 
   const doFetch = async () => {
     setIsLoading(true);
+    console.log("Fetching albums with filters:", filters, "and page:", page);
+
     let query = new URLSearchParams({
       page: page,
       page_size: 5,
       ordering: `-created_at`,
       ...filters,
     }).toString();
-    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/?${query}`, {})
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.results) {
-          setAlbums((prevAlbums) => [...prevAlbums, ...data.results]);
-          setNextUrl(data.next);
-        }
-      })
-      .catch(() => {
-        setIsError(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/?${query}`, {});
+      if (!response.ok) {
+        throw new Error(`Error fetching albums: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Albums fetched successfully:", data);
+
+      if (data.results) {
+        setAlbums((prevAlbums) => [...prevAlbums, ...data.results]);
+        setNextUrl(data.next);
+      }
+    } catch (error) {
+      console.error("Fetch albums error:", error);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   useEffect(() => {
+    console.log("Running doFetch with page and filters change");
     doFetch();
   }, [page, filters, refresh]);
 
     const fetchAlbumsAndArtists = async () => {
       setIsLoading(true);
+      console.log("Fetching albums and artists with token:", state.token);
+
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`,
@@ -109,14 +117,17 @@ export default function Albums() {
             },
           }
         );
+        if (!response.ok) {
+          throw new Error(`Error fetching albums: ${response.status}`);
+        }
         const data = await response.json();
+        console.log("Albums and artists fetched successfully:", data);
+
         if (data.results) {
           const albumsWithArtists = await Promise.all(
             data.results.map(async (album) => {
               const artistResponse = await fetch(
-                `${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/${
-                  album.artist
-                }/`,
+                `${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/${album.artist}/`,
                 {
                   method: "GET",
                   headers: {
@@ -125,13 +136,17 @@ export default function Albums() {
                   },
                 }
               );
+              if (!artistResponse.ok) {
+                throw new Error(`Error fetching artist: ${artistResponse.status}`);
+              }
               const artistData = await artistResponse.json();
-              return {...album, artistName: artistData.name};
+              return { ...album, artistName: artistData.name };
             })
           );
           setAlbums(albumsWithArtists);
         }
       } catch (error) {
+        console.error("Fetch albums and artists error:", error);
         setIsError(true);
       } finally {
         setIsLoading(false);
@@ -142,29 +157,30 @@ export default function Albums() {
   }, [state.token]);
 
   const handleEdit = (album) => {
+    console.log("Editing album:", album);
     setSelectedAlbum(album);
     setShowPopupAlbum(true);
   };
 
   const handleDelete = (id) => {
+    console.log("Deleting album with ID:", id);
     setShowPopupAlter(false);
     setIdAlbumDelete(id);
     setShowPopup(true);
-    setMessage("¿Seguro que desea eliminar el album?.");
+    setMessage("¿Seguro que desea eliminar el album?");
   };
 
   const handleView = (album) => {
-    console.log(`View album with id: ${album}`);
+    console.log("Viewing album:", album);
     setSelectedAlbum(album);
     setShowPopupViewAlbum(true);
   };
 
-  function handleConfigPopup() {
+  const handleConfigPopup = () => {
     if (!showPopupAlter) {
+      console.log("Deleting album on confirmation with ID:", idAlbumDelete);
       fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL
-        }harmonyhub/albums/${idAlbumDelete}/`,
+        `${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/${idAlbumDelete}/`,
         {
           method: "DELETE",
           headers: {
@@ -174,10 +190,12 @@ export default function Albums() {
         }
       ).then((response) => {
         if (!response.ok) {
+          console.error("Delete album error:", response.status);
           setShowPopup(true);
           setMessage("Sólo el propietario puede eliminar este álbum.");
           setShowPopupAlter(true);
         } else {
+          console.log("Album deleted successfully");
           setShowPopup(true);
           setMessage("El album fue eliminado.");
           setShowPopupAlter(true);
@@ -188,11 +206,12 @@ export default function Albums() {
     } else {
       setShowPopup(false);
     }
-  }
+  };
 
   function handleClosePopup() {
     setShowPopup(false);
   }
+
   function handleClosePopupAlbum() {
     setShowPopupAlbum(false);
     setAlbums([]);
@@ -204,15 +223,16 @@ export default function Albums() {
     setAlbums([]);
     setRefresh((prev) =>!prev);
   }
+
   function handleClosePopupViewAlbum() {
     setShowPopupViewAlbum(false);
   }
 
   return (
-    <div style={{display: "flex", height: "100vh"}}>
-      <aside style={{width: "200px", background: "#A5FFC9", padding: "10px"}}>
+    <div style={{ display: "flex", height: "100vh" }}>
+      <aside style={{ width: "200px", background: "#A5FFC9", padding: "10px" }}>
         <nav>
-          <ul style={{listStyle: "none", padding: 0}}>
+          <ul style={{ listStyle: "none", padding: 0 }}>
             {menuItems.map((item, index) => (
               <li key={index}>
                 <Link to={item.path}>{item.label}</Link>
@@ -221,7 +241,7 @@ export default function Albums() {
           </ul>
         </nav>
       </aside>
-      <main style={{flex: 1, background: "#222222", padding: "10px"}}>
+      <main style={{ flex: 1, background: "#222222", padding: "10px" }}>
         <header
           style={{
             display: "flex",

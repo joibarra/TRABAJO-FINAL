@@ -35,7 +35,7 @@ const PopupCreateAlbum = ({onClose}) => {
         if (response.ok){onClose()}
         if (response.status == 401) {
           setErrorAccept(true);
-        }
+        }else onClose ()
       });
     }
   };
