@@ -12,7 +12,6 @@ const PopupViewAlbum = ({album, onClose}) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.results) {
-          console.log("data", data.results);
           setSongs(data.results);
         }
       });
@@ -22,44 +21,33 @@ const PopupViewAlbum = ({album, onClose}) => {
       <div className="modal is-active">
         <div className="modal-background"></div>
         <div className="modal-content">
-          <h2 style = {{color: "white"}} className="title">Ver Album</h2>
+          <h2 className="title">Album</h2>
           <form className="box">
             <div
               style={{
                 display: "flex",
                 color: "#61F2B1",
                 justifyContent: "space-around",
+                gap: "15px",
               }}
             >
               <div className="control" style={{marginRight: "20px"}}>
                 <label className="label">Título:</label>
-
-                <input
-                  className="input"
-                  type="text"
-                  name="title"
-                  defaultValue={album.title}
-                />
+                <p className="input" type="text" name="title">
+                  {album.title}
+                </p>
               </div>
               <div className="control" style={{marginRight: "20px"}}>
                 <label className="label">Año:</label>
-
-                <input
-                  className="input"
-                  type="number"
-                  name="year"
-                  defaultValue={album.year}
-                />
+                <p className="input" type="number" name="year">
+                  {album.year}
+                </p>
               </div>
               <div className="control" style={{marginRight: "20px"}}>
                 <label className="label">Artista:</label>
-
-                <input
-                  className="input"
-                  type="text"
-                  name="artist"
-                  defaultValue={album.artistName}
-                />
+                <p className="input" type="text" name="artist" readOnly>
+                  {album.artistName}
+                </p>
               </div>
             </div>
             <ul>

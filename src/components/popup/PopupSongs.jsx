@@ -1,12 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useAuth} from "../../contexts/AuthContext";
-import {useNavigate} from "react-router-dom";
+import AsyncSelect from "react-select/async";
 
 const PopupSongs = ({onClose}) => {
   const state = useAuth("state");
-  const [songs, setSongs] = useState([]);
   const [errorAccept, setErrorAccept] = useState(false);
-  const [songFile, setSongFile] = useState(null);
+  const [titleAlbum, setTitleAlbum] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     year: "",
@@ -31,6 +30,14 @@ const PopupSongs = ({onClose}) => {
         song_file: file,
       });
     }
+  };
+
+  const handleChangeArt = (selectedOption) => {
+    setTitleAlbum(selectedOption);
+    setFormData({
+      ...formData,
+      album: selectedOption ? selectedOption.value : 0,
+    });
   };
 
   const onAccept = () => {
@@ -65,21 +72,31 @@ const PopupSongs = ({onClose}) => {
     }
   };
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        Authorization: `Token ${state.token}`,
-      },
-    })
+  const loadOptions = (inputValue, callback) => {
+    fetch(
+      `${
+        import.meta.env.VITE_API_BASE_URL
+      }harmonyhub/albums/?title=${inputValue}`, // Usar inputValue en la URL
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          Authorization: `Token ${state.token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
-        if (data.results) {
-          setSongs(data.results);
-        }
+        const options = data.results.map((alb) => ({
+          value: alb.id,
+          label: alb.title,
+        }));
+        callback(options);
+      })
+      .catch((error) => {
+        console.error("Error fetching albums:", error);
       });
-  }, []);
+  };
 
   return (
     <div>
@@ -115,19 +132,15 @@ const PopupSongs = ({onClose}) => {
             <div className="field">
               <label className="label">Albums:</label>
               <div className="control">
-                <div className="select">
-                  <select
-                    name="album"
-                    value={formData.album}
-                    onChange={handleChange}
-                  >
-                    {songs.map((song) => (
-                      <option key={song.id} value={song.id}>
-                        {song.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AsyncSelect
+                  loadOptions={loadOptions}
+                  value={titleAlbum}
+                  onChange={handleChangeArt}
+                  placeholder="Selecciona un album..."
+                  isClearable
+                  cacheOptions
+                  defaultOptions
+                />
               </div>
             </div>
             <div className="field">

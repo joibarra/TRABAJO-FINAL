@@ -1,10 +1,9 @@
-import { createBrowserRouter } from "react-router-dom";
+import {createBrowserRouter} from "react-router-dom";
 import AlbumsForm from "../components/Album/AlbumsForm";
 import Layout from "./Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import Profile from "../components/Profile";
 import SongList from "../components/MusicPlayer/SongList";
-import Album from "../components/Album/Albums";
 import BuscadorDeCanciones from "../components/BuscadorDeCanciones"; // Asegúrate de que la ruta de importación sea correcta
 import Login from "../components/Auth/Login";
 import Albums from "../components/Album/Albums";
@@ -19,7 +18,7 @@ const routes = [
         element: <Login />,
       },
       {
-        path: "album",
+        path: "home",
         element: (
           <ProtectedRoute>
             <Albums />
@@ -33,7 +32,7 @@ const routes = [
             index: true,
             element: (
               <ProtectedRoute>
-                <Album />
+                <Albums />
               </ProtectedRoute>
             ),
           },
@@ -81,4 +80,4 @@ const routes = [
 
 const Router = createBrowserRouter(routes);
 
-export { Router, routes };
+export {Router, routes};

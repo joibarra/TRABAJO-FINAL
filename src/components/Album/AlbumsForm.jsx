@@ -74,9 +74,10 @@ export default function AlbumForm() {
       if (albumImage) {
         newForm.append("image", albumImage);
       }
-      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
+      fetch(`${import.meta.env.VITE_API_BASE_URL}infosphere/albums/`, {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Token ${state.token}`,
         },
         body: newForm,
@@ -156,7 +157,7 @@ export default function AlbumForm() {
         <div className="field">
           <label className="label">fecha de creación a partir de : </label>
           <div className="control">
-          <textarea
+            <textarea
               className="textarea"
               name="content"
               value={albumData.content}
@@ -193,12 +194,7 @@ export default function AlbumForm() {
           </div>
         </div>
       </form>
-      {showPopup && (
-        <PopupCreateAlbum
-          
-          onClose={handleClosePopup}
-        />
-      )}
+      {showPopup && <PopupCreateAlbum onClose={handleClosePopup} />}
     </>
   );
 }

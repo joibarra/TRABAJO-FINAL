@@ -3,6 +3,7 @@ import {useAuth} from "../../contexts/AuthContext";
 import {useNavigate} from "react-router-dom";
 
 function Login() {
+  const state = useAuth("state");
   const usernameRef = useRef("");
   const passwordRef = useRef("");
   const [isError, setIsError] = useState(false);
@@ -11,6 +12,7 @@ function Login() {
   const {login} = useAuth("actions");
 
   function handleSubmit(event) {
+    console.log("token>>", state.token);
     event.preventDefault();
     if (!isLoading) {
       setIsLoading(true);
@@ -18,6 +20,7 @@ function Login() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `token ${state.token}`,
         },
         body: JSON.stringify({
           username: usernameRef.current.value,
@@ -32,7 +35,7 @@ function Login() {
         })
         .then((responseData) => {
           login(responseData.token);
-          navigate("/albums");
+          navigate("/home");
         })
         .catch((error) => {
           console.error("Error error al iniciar sesión", error);

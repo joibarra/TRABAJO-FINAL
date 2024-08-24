@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 import ArtistCard from "./ArtistCard";
 import PopupArtists from "../popup/PopupArtists";
+import Navbar from "../Navbar/Navbar";
 
 function ArtistList() {
   const [page, setPage] = useState(1);
@@ -24,7 +25,7 @@ function ArtistList() {
       ordering: `-created_at`,
       ...filters,
     }).toString();
-
+    console.log("query>>", query);
     fetch(
       `${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/?${query}`,
       {}
@@ -102,11 +103,36 @@ function ArtistList() {
   if (!artists.length && !isLoading) return <p>No hay artistas disponibles</p>;
 
   return (
-    <div style={{backgroundColor: "hsl(141, 100%, 82%)", padding: "20px"}}>
-      <div className="my-5">
-        <h2 className="title">Lista de artistas</h2>
+    <div style={{display: "flex"}}>
+      <Navbar />
+      <div
+        style={{
+          flex: 1,
+          backgroundColor: "hsl(141, 100%, 82%)",
+          padding: "10px",
+        }}
+      >
+        <header
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "10px",
+          }}
+        >
+          <h1
+            style={{
+              color: "#5e6472",
+              fontSize: "40px",
+              fontWeight: "bold",
+              marginLeft: "15px",
+            }}
+          >
+            Lista de Artistas
+          </h1>
+        </header>
         <form className="box" onSubmit={handleSearch}>
-          <div className="field is-grouped">
+          <div style={{display: "flex", gap: 15, justifyContent: "center"}}>
             <div className="control">
               <label className="label">Nombre:</label>
               <input className="input" type="text" name="name" />
@@ -116,7 +142,7 @@ function ArtistList() {
               <input className="input" type="text" name="bio" />
             </div>
           </div>
-          <div className="field is-grouped">
+          <div style={{display: "flex", gap: 15, justifyContent: "center"}}>
             <div className="control">
               <label className="label">Página web:</label>
               <input className="input" type="text" name="website" />
@@ -126,13 +152,20 @@ function ArtistList() {
               <input className="input" type="text" name="created_at_min" />
             </div>
           </div>
-          <div className="field is-grouped">
+          <div style={{display: "flex", gap: 15, justifyContent: "center"}}>
             <div className="control">
               <label className="label">Fecha de creacion hasta:</label>
               <input className="input" type="text" name="created_at_max" />
             </div>
           </div>
-          <div className="field is-grouped">
+          <div
+            style={{
+              display: "flex",
+              gap: 15,
+              justifyContent: "center",
+              marginTop: "20px",
+            }}
+          >
             <div className="control">
               <button
                 className="button is-primary"
@@ -185,12 +218,12 @@ function ArtistList() {
           })}
         </ul>
         {isLoading && <p>Cargando más artistas...</p>}
+        {isPopupVisible && (
+          <PopupArtists onClose={handlePopupClose} />
+        )}
       </div>
-      {isPopupVisible && (
-        //crear popup artists
-        <PopupArtists onClose={handlePopupClose} />
-      )}
     </div>
   );
 }
+
 export default ArtistList;

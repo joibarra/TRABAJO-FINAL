@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, {useEffect, useState, useRef} from "react";
 import {
   Table,
   TableBody,
@@ -11,19 +10,19 @@ import {
   IconButton,
   LinearProgress,
   Button,
+  TablePagination,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PopupAlbum from "../popup/PopupAlbum";
-import { useAuth } from "../../contexts/AuthContext";
+import {useAuth} from "../../contexts/AuthContext";
 import PopupMsj from "../popup/PopupMsj";
 import PopupCreateAlbum from "../popup/PopupCreateAlbum";
 import PopupViewAlbum from "../popup/PopupViewAlbum";
+import Navbar from "../Navbar/Navbar";
 
 export default function Albums() {
-  const navigate = useNavigate();
   const state = useAuth("state");
-  const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [albums, setAlbums] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -32,26 +31,18 @@ export default function Albums() {
   const [message, setMessage] = useState("");
   const [selectedAlbum, setSelectedAlbum] = useState();
   const [filters, setFilters] = useState({});
-  const [page, setPage] = useState(1);
-  const [nextUrl, setNextUrl] = useState(null);
+  const [page, setPage] = useState(0);
   const [idAlbumDelete, setIdAlbumDelete] = useState();
   const [showPopupAlter, setShowPopupAlter] = useState(false);
   const [showPopupViewAlbum, setShowPopupViewAlbum] = useState(false);
   const [refresh, setRefresh] = useState(false);
-  const handleLogout = () => {
-    navigate("/");
-  };
-
-  const menuItems = [
-    { key: 1, path: "/albums", label: "Album" },
-    { key: 2, path: "/songs", label: "Canciones" },
-    { key: 3, path: "/ArtistList", label: "Artistas" },
-  ];
-
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Número de filas por página
+  const [totalAlbums, setTotalAlbums] = useState(0); // Total de álbumes para paginación
+  const lastSongElementRef = useRef();
+  const maxPage = Math.ceil(totalAlbums / rowsPerPage) - 1;
   const addAlbum = () => {
     setShowPopupCreate(true);
   };
-
   function handleSearch(event) {
     event.preventDefault();
     const searchForm = new FormData(event.target);
@@ -63,124 +54,106 @@ export default function Albums() {
     });
     setFilters(newFilters);
     setAlbums([]);
-    setPage(1);
+    setPage(0);
   }
+  useEffect(() => {
+    if (page > maxPage) {
+      setPage(maxPage);
+    } else if (page < 0) {
+      setPage(0);
+    }
+    if (totalAlbums === 0) {
+      setPage(0);
+    }
+  }, [totalAlbums, rowsPerPage]);
+  useEffect(() => {
+    fetchAlbumsAndArtists();
+  }, [page, filters, refresh]);
+  useEffect(() => {
+    if (albums.length === 0 && page !== 0) {
+      setPage(0);
+    }
+  }, [albums, page]);
 
-  const doFetch = async () => {
+  const fetchAlbumsAndArtists = async () => {
     setIsLoading(true);
-    console.log("Fetching albums with filters:", filters, "and page:", page);
-
-    let query = new URLSearchParams({
-      page: page,
-      page_size: 5,
-      ordering: `-created_at`,
-      ...filters,
-    }).toString();
-
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/?${query}`, {});
-      if (!response.ok) {
-        throw new Error(`Error fetching albums: ${response.status}`);
-      }
+      let query = new URLSearchParams({
+        page: page + 1,
+        page_size: 10,
+        ordering: `-created_at`,
+        ...filters,
+      }).toString();
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/?${query}`,
+        {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization: `token ${state.token}`,
+          },
+        }
+      );
       const data = await response.json();
-      console.log("Albums fetched successfully:", data);
-
       if (data.results) {
-        setAlbums((prevAlbums) => [...prevAlbums, ...data.results]);
-        setNextUrl(data.next);
+        const albumsWithArtists = await Promise.all(
+          data.results.map(async (album) => {
+            const artistResponse = await fetch(
+              `${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/${
+                album.artist
+              }/`,
+              {
+                method: "GET",
+                headers: {
+                  accept: "application/json",
+                  Authorization: `Token ${state.token}`,
+                },
+              }
+            );
+            const artistData = await artistResponse.json();
+            return {...album, artistName: artistData.name};
+          })
+        );
+        //setAlbums(albumsWithArtists);
+        setAlbums(albumsWithArtists);
+        setTotalAlbums(data.count); // Total de álbumes para la paginación
       }
-    } catch (error) {
-      console.error("Fetch albums error:", error);
-      setIsError(true);
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log("Running doFetch with page and filters change");
-    doFetch();
-  }, [page, filters, refresh]);
-
-    const fetchAlbumsAndArtists = async () => {
-      setIsLoading(true);
-      console.log("Fetching albums and artists with token:", state.token);
-
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Token ${state.token}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error(`Error fetching albums: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("Albums and artists fetched successfully:", data);
-
-        if (data.results) {
-          const albumsWithArtists = await Promise.all(
-            data.results.map(async (album) => {
-              const artistResponse = await fetch(
-                `${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/${album.artist}/`,
-                {
-                  method: "GET",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Token ${state.token}`,
-                  },
-                }
-              );
-              if (!artistResponse.ok) {
-                throw new Error(`Error fetching artist: ${artistResponse.status}`);
-              }
-              const artistData = await artistResponse.json();
-              return { ...album, artistName: artistData.name };
-            })
-          );
-          setAlbums(albumsWithArtists);
-        }
-      } catch (error) {
-        console.error("Fetch albums and artists error:", error);
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    useEffect(() => {
-      fetchAlbumsAndArtists();
-  }, [state.token]);
+  const handleChangePage = (event, newPage) => {
+    if (newPage >= 0 && newPage <= maxPage) {
+      setPage(newPage);
+    } else if (newPage < 0) {
+      setPage(0); // Asegurarse de que la página no sea negativa
+    }
+  };
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleEdit = (album) => {
-    console.log("Editing album:", album);
     setSelectedAlbum(album);
     setShowPopupAlbum(true);
   };
-
   const handleDelete = (id) => {
-    console.log("Deleting album with ID:", id);
     setShowPopupAlter(false);
     setIdAlbumDelete(id);
     setShowPopup(true);
-    setMessage("¿Seguro que desea eliminar el album?");
+    setMessage("¿Seguro que desea eliminar el album?.");
   };
-
   const handleView = (album) => {
-    console.log("Viewing album:", album);
     setSelectedAlbum(album);
     setShowPopupViewAlbum(true);
   };
-
-  const handleConfigPopup = () => {
+  function handleConfigPopup() {
     if (!showPopupAlter) {
-      console.log("Deleting album on confirmation with ID:", idAlbumDelete);
       fetch(
-        `${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/${idAlbumDelete}/`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }harmonyhub/albums/${idAlbumDelete}/`,
         {
           method: "DELETE",
           headers: {
@@ -190,58 +163,42 @@ export default function Albums() {
         }
       ).then((response) => {
         if (!response.ok) {
-          console.error("Delete album error:", response.status);
           setShowPopup(true);
           setMessage("Sólo el propietario puede eliminar este álbum.");
           setShowPopupAlter(true);
         } else {
-          console.log("Album deleted successfully");
           setShowPopup(true);
           setMessage("El album fue eliminado.");
           setShowPopupAlter(true);
           setAlbums([]);
-          setRefresh((prev) =>!prev);
+          setRefresh((prev) => !prev); // Actualiza el estado para forzar la recarga
         }
       });
     } else {
       setShowPopup(false);
     }
-  };
-
+  }
   function handleClosePopup() {
     setShowPopup(false);
   }
-
   function handleClosePopupAlbum() {
     setShowPopupAlbum(false);
     setAlbums([]);
-    setRefresh((prev) =>!prev);
+    setRefresh((prev) => !prev); //
   }
-
   function handleClosePopupCreate() {
     setShowPopupCreate(false);
     setAlbums([]);
-    setRefresh((prev) =>!prev);
+    setRefresh((prev) => !prev); //
   }
-
   function handleClosePopupViewAlbum() {
     setShowPopupViewAlbum(false);
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <aside style={{ width: "200px", background: "#A5FFC9", padding: "10px" }}>
-        <nav>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {menuItems.map((item, index) => (
-              <li key={index}>
-                <Link to={item.path}>{item.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
-      <main style={{ flex: 1, background: "#222222", padding: "10px" }}>
+    <div style={{display: "flex"}}>
+      <Navbar />
+      <main style={{flex: 1, background: "#222222", padding: "10px"}}>
         <header
           style={{
             display: "flex",
@@ -252,36 +209,20 @@ export default function Albums() {
         >
           <h1
             style={{
-              color: "#61F2B1",
+              color: "#b8f2e6",
               fontSize: "40px",
               fontWeight: "bold",
               marginLeft: "15px",
             }}
           >
-            Albums
+            Lista de Albumes
           </h1>
-          <button
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "#333",
-              color: "#61F2B1",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "#61F2B1",
-              alignSelf: "flex-end",
-              border: "2px solid black",
-            }}
-            onClick={handleLogout}
-          >
-            Cerrar Sesión
-          </button>
         </header>
         <form className="box" onSubmit={handleSearch}>
           <div
             style={{
               display: "flex",
-              color: "#61F2B1",
+              color: "#b8f2e6",
               justifyContent: "space-around",
             }}
           >
@@ -360,21 +301,18 @@ export default function Albums() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      padding="none"
-                      sx={{
-                        "&.MuiTableCell-root": {
-                          paddingX: 1,
-                        },
-                      }}
-                    >
+                    <TableCell colSpan={6} padding="none">
                       <LinearProgress />
                     </TableCell>
                   </TableRow>
                 ) : (
-                  albums.map((album) => (
-                    <TableRow key={album.id}>
+                  albums.map((album, index) => (
+                    <TableRow
+                      key={album.id}
+                      ref={
+                        index === albums.length - 1 ? lastSongElementRef : null
+                      }
+                    >
                       <TableCell>{album.title}</TableCell>
                       <TableCell>{album.artistName}</TableCell>
                       <TableCell>{album.year}</TableCell>
@@ -406,6 +344,19 @@ export default function Albums() {
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            component="div"
+            count={totalAlbums}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Álbumes por página"
+            labelDisplayedRows={({from, to, count}) =>
+              `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
+            }
+            style={{backgroundColor: "white"}}
+          />
           {showPopupAlbum && (
             <PopupAlbum album={selectedAlbum} onClose={handleClosePopupAlbum} />
           )}

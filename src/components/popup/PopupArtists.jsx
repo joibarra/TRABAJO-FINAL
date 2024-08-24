@@ -1,27 +1,17 @@
 import React, {useEffect, useState} from "react";
 import {useAuth} from "../../contexts/AuthContext";
 
-
-const PopupArtists = ({ onClose}) => {
+const PopupArtists = ({onClose}) => {
   const state = useAuth("state");
   const [artists, setArtists] = useState([]);
   const [errorAccept, setErrorAccept] = useState(false);
   const [formData, setFormData] = useState({
-    name: artists.name,
-    bio: artists.bio,
-    website: artists.website,
-    image: artists.image
+    name: "",
+    bio: "",
+    website: "",
+    image: null,
   });
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData ({
-        ...formData,
-        image: file,
-
-      })
-    }
-  }
+  const [uploading, setUploading] = useState(false);
   const handleChange = (e) => {
     const {name, value} = e.target;
     setFormData({
@@ -29,32 +19,48 @@ const PopupArtists = ({ onClose}) => {
       [name]: value,
     });
   };
-
-  const onAccept=()=>{
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({
+        ...formData,
+        image: file,
+      });
+    }
+  };
+  const onAccept = () => {
     if (formData.name) {
       const formDataArtist = new FormData();
       formDataArtist.append("name", formData.name);
       formDataArtist.append("bio", formData.bio);
       formDataArtist.append("website", formData.website);
       formDataArtist.append("image", formData.image);
-      
-    console.log(formData)
-    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        Authorization: `Token ${state.token}`,
-      },
-      body: formDataArtist
-    }).then((response) => {
-      if (response.ok) {
-        onClose();
-      } else {
-        setErrorAccept(true);
-      }
-    });
-  }
-};
+      setUploading(true);
+      console.log("formDataArtist: " + formDataArtist);
+      console.log("formData: " + formData);
+      fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          Authorization: `Token ${state.token}`,
+        },
+        body: formDataArtist,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setUploading(false);
+          if (data && data.id) {
+            onClose();
+          } else {
+            setErrorAccept(true);
+          }
+        })
+        .catch(() => {
+          setUploading(false);
+          setErrorAccept(true);
+        });
+    }
+  };
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/artists/`, {
       method: "GET",
@@ -76,8 +82,8 @@ const PopupArtists = ({ onClose}) => {
       <div className="modal is-active">
         <div className="modal-background"></div>
         <div className="modal-content">
-          <h2 style = {{color: "white"}}className="name"> Nuevo Artista</h2>
-          <form className="box" >
+          <h2 className="title">Nuevo Artista</h2>
+          <form className="box">
             <div className="field">
               <label className="label">Nombre:</label>
               <div className="control">
@@ -96,7 +102,6 @@ const PopupArtists = ({ onClose}) => {
                   className="input"
                   type="text"
                   name="bio"
-                  
                   onChange={handleChange}
                 />
               </div>
@@ -108,8 +113,8 @@ const PopupArtists = ({ onClose}) => {
                   className="input"
                   type="url"
                   name="website"
-                    onChange={handleChange}
-                  />
+                  onChange={handleChange}
+                />
               </div>
             </div>
             <div className="field">
@@ -121,18 +126,38 @@ const PopupArtists = ({ onClose}) => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-          />
+              />
             </div>
- 
-            <div className="field"style={{ display: "flex", justifyContent: "space-between" }}>
-              <button onClick={onAccept}className="button is-primary" type="button">
+
+            <div
+              className="field"
+              style={{display: "flex", justifyContent: "space-between"}}
+            >
+              <button
+                onClick={onAccept}
+                className="button is-primary"
+                type="button"
+              >
                 Aceptar
               </button>
-            
-              <button  onClick={onClose} className="button is-primary" type="button">
+
+              <button
+                onClick={onClose}
+                className="button is-primary"
+                type="button"
+              >
                 Cancelar
               </button>
-              </div>
+            </div>
+            {(!formData.name || !formData.bio || !formData.image) && (
+              <p>Inserte título, año y archivo MP3 de la canción.</p>
+            )}
+            {errorAccept && (
+              <p>
+                No puede insertar la canción! Las credenciales de autenticación
+                no se proveyeron o hubo un error.
+              </p>
+            )}
           </form>
         </div>
       </div>

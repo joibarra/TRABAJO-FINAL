@@ -1,20 +1,30 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useAuth} from "../../contexts/AuthContext";
+import AsyncSelect from "react-select/async";
 
 const PopupCreateAlbum = ({onClose}) => {
   const state = useAuth("state");
-  const [artists, setArtists] = useState([]);
   const [errorAccept, setErrorAccept] = useState(false);
+  const [titleArt, setTitleArt] = useState(null);
   const [formData, setFormData] = useState({
-    title: artists.title,
-    year: artists.year,
-    artist: artists.id,
+    title: "",
+    year: 0,
+    artist: 0,
   });
+
   const handleChange = (e) => {
     const {name, value} = e.target;
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  const handleChangeArt = (selectedOption) => {
+    setTitleArt(selectedOption);
+    setFormData({
+      ...formData,
+      artist: selectedOption ? selectedOption.value : 0,
     });
   };
 
@@ -24,7 +34,7 @@ const PopupCreateAlbum = ({onClose}) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${state.token}`,
+          Authorization: `token ${state.token}`,
         },
         body: JSON.stringify({
           title: formData.title,
@@ -32,37 +42,58 @@ const PopupCreateAlbum = ({onClose}) => {
           artist: formData.artist,
         }),
       }).then((response) => {
-        if (response.ok){onClose()}
-        if (response.status == 401) {
+        if (response.ok) {
+          onClose();
+        } else {
           setErrorAccept(true);
-        }else onClose ()
+        }
       });
     }
   };
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}harmonyhub/albums/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${state.token}`,
-      },
-    })
+  const loadOptions = (inputValue, callback) => {
+    fetch(
+      `${
+        import.meta.env.VITE_API_BASE_URL
+      }harmonyhub/artists/?name=${inputValue}`,
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          Authorization: `Token ${state.token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
-        if (data.results) {
-          setArtists(data.results);
-        }
+        const options = data.results.map((artist) => ({
+          value: artist.id,
+          label: artist.name,
+        }));
+        callback(options);
+      })
+      .catch((error) => {
+        console.error("Error fetching artists:", error);
       });
-  }, []);
+  };
 
   return (
     <div>
       <div className="modal is-active">
         <div className="modal-background"></div>
         <div className="modal-content">
-          <h2 style = {{color: "white"}}className="title">Nuevo Album</h2>
-          <form className="box">
+          <h2 className="title">Nuevo Album</h2>
+          <form
+            className="box"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItem:
+                "stretch" /* Asegura que los elementos se estiren al ancho disponible */,
+              padding: "20px",
+              maxWidth: "100%",
+            }}
+          >
             <div className="field">
               <label className="label">Título:</label>
               <div className="control">
@@ -88,15 +119,15 @@ const PopupCreateAlbum = ({onClose}) => {
             <div className="field">
               <label className="label">Artista:</label>
               <div className="control">
-                <div className="select">
-                  <select name="artist" onChange={handleChange}>
-                    {artists.map((artists) => (
-                      <option key={artists.id} value={artists.id}>
-                        {artists.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <AsyncSelect
+                  loadOptions={loadOptions}
+                  value={titleArt}
+                  onChange={handleChangeArt}
+                  placeholder="Selecciona un artista..."
+                  isClearable
+                  cacheOptions
+                  defaultOptions
+                />
               </div>
             </div>
             <div
@@ -104,7 +135,6 @@ const PopupCreateAlbum = ({onClose}) => {
               style={{display: "flex", justifyContent: "space-between"}}
             >
               <div>
-                {" "}
                 <button
                   onClick={onAccept}
                   className="button is-primary"
@@ -114,7 +144,6 @@ const PopupCreateAlbum = ({onClose}) => {
                 </button>
               </div>
               <div>
-                {" "}
                 <button
                   type="button"
                   onClick={onClose}
@@ -125,12 +154,12 @@ const PopupCreateAlbum = ({onClose}) => {
               </div>
             </div>
             {(!formData.title || !formData.year) && (
-              <p>Inserte titulo y año del album.</p>
+              <p>Inserte título y año del álbum.</p>
             )}
             {errorAccept && (
               <p>
-                No puede insertar album! Las credenciales de autenticación no se
-                proveyeron.
+                ¡No se puede insertar el álbum! Las credenciales de
+                autenticación no se proveyeron.
               </p>
             )}
           </form>
