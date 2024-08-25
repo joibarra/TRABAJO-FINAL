@@ -1,6 +1,6 @@
-import {useRef, useState} from "react";
-import {useAuth} from "../../contexts/AuthContext";
-import {useNavigate} from "react-router-dom";
+import { useRef, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const state = useAuth("state");
@@ -9,7 +9,7 @@ function Login() {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const {login} = useAuth("actions");
+  const { login } = useAuth("actions");
 
   function handleSubmit(event) {
     console.log("token>>", state.token);
@@ -64,7 +64,7 @@ function Login() {
           }}
         >
           <form onSubmit={handleSubmit}>
-            <div className="field" style={{background: "#eaeaea"}}>
+            <div className="field" style={{ background: "#eaeaea" }}>
               <label htmlFor="username">Nombre de usuario:</label>
               <div className="control has-icons-left">
                 <input
@@ -110,6 +110,21 @@ function Login() {
             </div>
           </form>
         </div>
+      </div>
+      {/* Agregar la imagen debajo del cuadro de login */}
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <img
+          src="https://i.ibb.co/r4ksbjp/music-gif-24483759.gif"
+          alt="Music GIF"
+          srcSet="
+            https://i.ibb.co/r4ksbjp/music-gif-24483759.gif 1x,
+            https://i.ibb.co/r4ksbjp/music-gif-24483759.gif 2x"
+          style={{
+            width: "250px",
+            height: "auto",
+            imageRendering: "crisp-edges", 
+          }}
+        />
       </div>
     </section>
   );
